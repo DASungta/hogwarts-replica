@@ -34,7 +34,7 @@
 
 ## 在线看
 
-- **在线版**：<https://claude.ai/artifact/DoySVELe5BZDSEf6htjssS>
+- **在线版**：<https://dasungta.github.io/hogwarts-replica/>（GitHub Pages；打开后要等半分钟左右搭建场景，用电脑上的 Chrome 效果最好）
 - **本地**：下载 [`dist/index.html`](dist/index.html)，用 Chrome 打开（需要联网加载 three.js 和字体）。
 
 页面上可以拖动旋转、滚轮缩放。左下角的工具栏里，"镜头"菜单有 38 个机位，室内的大礼堂和大楼梯也在里面；"地图"打开平面图，
@@ -92,7 +92,7 @@ node tools/film.mjs --spp 8 --w 1920 --h 1080 --out out/snitch --name hogwarts-s
 
 Chrome 不在默认位置时，用环境变量 `CHROME` 指定路径。影片出来是没有声音的，配乐请用你自己有权使用的音乐。
 
-本地的网址参数：`shot=` 机位（`front`、`hall`、`stair`、`quidditch` 等，和"镜头"菜单一致）、`night=1` 夜晚、`map=1` 打开地图、
+网址参数在线版和本地都能用，比如 <https://dasungta.github.io/hogwarts-replica/?shot=front&night=1>：`shot=` 机位（`front`、`hall`、`stair`、`quidditch` 等，和"镜头"菜单一致）、`night=1` 夜晚、`map=1` 打开地图、
 `cut=snitch|dusk|magic` 换要播放的影片、`grade=natural` 关掉电影调色。
 
 参考照片可以重新下载：`python -I tools/commons_fetch.py ref/model --restore`（`ref/` 下其他文件夹同理）。

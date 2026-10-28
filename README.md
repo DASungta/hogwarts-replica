@@ -37,7 +37,7 @@ Produced by **dasungta** · built by **Opus 5.5** (Claude Code)
 
 ## See it
 
-- **Online**: <https://claude.ai/artifact/DoySVELe5BZDSEf6htjssS>
+- **Online**: <https://dasungta.github.io/hogwarts-replica/> (GitHub Pages; the scene takes about half a minute to build, best in Chrome on a computer)
 - **Locally**: download [`dist/index.html`](dist/index.html) and open it in Chrome (it loads three.js and the fonts from the web).
 
 Drag to orbit and scroll to zoom. In the toolbar at the bottom left, the shot menu (镜头) has 38 viewpoints, including the Great Hall and the
@@ -112,7 +112,7 @@ node tools/film.mjs --spp 8 --w 1920 --h 1080 --out out/snitch --name hogwarts-s
 If Chrome is not in its usual place, set the `CHROME` environment variable to its path. The films come out silent; score
 them with music you have the right to use.
 
-Address parameters for local use: `shot=` a viewpoint (`front`, `hall`, `stair`, `quidditch` and the rest of the shot menu),
+Address parameters work online and locally, for example <https://dasungta.github.io/hogwarts-replica/?shot=front&night=1>: `shot=` a viewpoint (`front`, `hall`, `stair`, `quidditch` and the rest of the shot menu),
 `night=1` night, `map=1` open the map, `cut=snitch|dusk|magic` choose the film, `grade=natural` turn off the film grade.
 
 The reference photos can be downloaded again: `python -I tools/commons_fetch.py ref/model --restore` (likewise for the
