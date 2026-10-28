@@ -1,0 +1,15 @@
+# 依赖和渲染
+node_modules/
+out/
+
+# 参考照片不进仓库：清单在 ref/*/SOURCES.json，用 tools/commons_fetch.py <文件夹> --restore 下载
+ref/**/*.jpg
+ref/**/*.png
+
+# 自己找的配乐放这里，别提交
+audio/
+
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

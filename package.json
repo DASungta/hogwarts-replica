@@ -1,0 +1,17 @@
+{
+  "name": "hogwarts-replica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An unofficial fan replica of the Hogwarts castle from the films, built entirely in code with three.js (no models, textures or images).",
+  "license": "MIT",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "serve": "node tools/serve.mjs 8747"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "three": "0.186.1"
+  }
+}
