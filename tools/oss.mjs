@@ -45,6 +45,18 @@ const walk = (d, out = []) => {
   return out;
 };
 
+// a change merged on GitHub (someone's pull request) is not in this folder yet: the export would undo it, so stop
+if (fs.existsSync(path.join(dest, '.git'))) {
+  const git = (...a) => spawnSync('git', ['-C', dest, ...a], { encoding: 'utf8' });
+  git('fetch', '-q', 'origin');
+  const ahead = +git('rev-list', '--count', 'HEAD..origin/main').stdout.trim() || 0;
+  if (ahead) {
+    console.log(`origin/main has ${ahead} commit(s) that ${dest} lacks. Pull them there (git pull), copy what they change`);
+    console.log('back into this folder (src/, tools/ as they are; README and licences into oss/; notes into README.md or docs/), then export.');
+    process.exit(1);
+  }
+}
+
 const b = spawnSync(process.execPath, [path.join(root, 'tools/build.mjs')], { stdio: 'inherit' });
 if (b.status !== 0) process.exit(1);
 

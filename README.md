@@ -10,6 +10,8 @@ Commons by solving each photo's camera.
 
 Produced by **dasungta** · built by **Opus 5.5** (Claude Code)
 
+**Anyone interested is welcome to join in and help make it more detailed.** See [Join in](#join-in) below.
+
 > **Unofficial fan project.** Not affiliated with or authorised by Warner Bros., J.K. Rowling or any rights holder of
 > Harry Potter. The film design of the castle, its names and the house crests belong to their owners. For learning only,
 > no commercial use. See [LICENSE-CONTENT.md](LICENSE-CONTENT.md).
@@ -22,12 +24,12 @@ Produced by **dasungta** · built by **Opus 5.5** (Claude Code)
 <td width="50%"><img src="docs/images/hall.jpg" alt="The Great Hall"><br>The Great Hall</td>
 </tr>
 <tr>
-<td><img src="docs/images/stair.jpg" alt="The Grand Staircase"><br>The moving Grand Staircase</td>
+<td><img src="docs/images/stairflight.jpg" alt="The Grand Staircase"><br>The Grand Staircase: moving flights, arcaded balustrades and walls of portraits</td>
 <td><img src="docs/images/woodbridge.jpg" alt="The Wooden Bridge"><br>The Wooden Bridge</td>
 </tr>
 <tr>
 <td><img src="docs/images/quidditch.jpg" alt="The Quidditch pitch"><br>The Quidditch pitch</td>
-<td><img src="docs/images/station.jpg" alt="Hogsmeade Station"><br>Hogsmeade Station and the Hogwarts Express</td>
+<td><img src="docs/images/hallowl.jpg" alt="The golden owl lectern"><br>The golden owl lectern on the Great Hall's dais</td>
 </tr>
 <tr>
 <td><img src="docs/images/hagrid.jpg" alt="Hagrid's hut and the Whomping Willow"><br>Hagrid's hut and the Whomping Willow</td>
@@ -87,6 +89,41 @@ one in code → compare side by side with the reference → fix.
 - 21–28 October 2026, 8 days
 - About 11,000 lines of JavaScript in 36 source files, plus about 2,200 lines of tools
 - What changed in every version, and why, is in [docs/开发笔记.md](docs/开发笔记.md) (development notes, in Chinese)
+
+## Join in
+
+The producer and Claude made this in eight days, and it is still a long way from the castle in the films. If you love
+Hogwarts too, know some three.js or shaders, or simply have a sharp eye and good reference photos, you are welcome to help
+make it more detailed.
+
+Things to do:
+
+- **Interiors**: besides the Great Hall and the Grand Staircase, 12 rooms are not built yet: the Headmaster's office, the
+  Gryffindor common room and dormitory, the library and the Restricted Section, the Potions classroom, the top of the
+  Astronomy Tower, the Room of Requirement, the hospital wing ward, the Defence Against the Dark Arts classroom, the
+  Transfiguration classroom, the Chamber of Secrets, the Slytherin common room and the trophy room
+- **Building detail**: keep checking the proportions, windows, roofs and carving of the 46 buildings against photos of the
+  miniature. Many of them are close, but not yet the same
+- **Grounds and nature**: the look of the Forbidden Forest, the Black Lake, the cliffs, the grass and the trees
+- **Performance**: make it open smoothly on laptops and phones
+- **Spotting mistakes**: if something differs from the films or sits in the wrong place, open an issue, ideally with a
+  reference photo under a free licence
+
+How to take part:
+
+1. Open an issue first and say which part you would like to work on, so that people don't collide.
+2. Read "地图和建筑清单" (the map and building list) and "踩过的坑" (pitfalls) in [docs/开发笔记.md](docs/开发笔记.md).
+   Buildings are registered in the `SITE` table in `src/js/05-site.js`; the parts are in `src/js/40-kit.js` and `45-range.js`.
+3. When you are done, render before and after stills from the same viewpoint with `tools/shot.mjs` and put them in the
+   pull request together with the reference photo (`tools/pair.py` puts them side by side).
+
+Ground rules:
+
+- Code only: no 3D models, textures, film stills or film music.
+- Reference photos must have a free licence (for example from Wikimedia Commons), with their sources recorded in
+  `ref/*/SOURCES.json`.
+- It stays an unofficial, non-commercial fan project. Code you contribute is released under MIT, text and images under
+  CC BY-NC 4.0.
 
 ## Run it locally
 
