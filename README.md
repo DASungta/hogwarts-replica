@@ -42,8 +42,8 @@ Produced by **dasungta** · built by **Opus 5.5** (Claude Code)
 - **Online**: <https://dasungta.github.io/hogwarts-replica/> (GitHub Pages; the scene takes about half a minute to build, best in Chrome on a computer)
 - **Locally**: download [`dist/index.html`](dist/index.html) and open it in Chrome (it loads three.js and the fonts from the web).
 
-Drag to orbit and scroll to zoom. In the toolbar at the bottom left, the shot menu (镜头) has 38 viewpoints, including the Great Hall and the
-Grand Staircase inside. The map button (地图) opens the plan: click any building to fly there. The night button (夜晚)
+Drag to orbit and scroll to zoom. In the toolbar at the bottom left, the shot menu (镜头) has 47 viewpoints, including the Great Hall, the
+Grand Staircase and the Gryffindor common room inside. The map button (地图) opens the plan: click any building to fly there. The night button (夜晚)
 switches to night with lit windows. The tour button (播放运镜) plays a camera tour from the train's arrival and the boats
 across the lake to the Great Hall, then a flight over the grounds the next morning. When the view stops moving, the picture
 keeps accumulating samples and gets cleaner the longer you wait. The interface is in Chinese.
@@ -55,16 +55,19 @@ keeps accumulating samples and gets cleaner the longer you wait. The interface i
   curtain wall, the ruins, the greenhouses, the boathouse and its stairs, the stone circle, Hagrid's hut, the Whomping
   Willow, the Quidditch pitch, the Forbidden Forest, the Training Grounds, and on the south shore of the lake Hogsmeade
   Station and the Hogwarts Express
-- **Two interiors**: the Great Hall (stone beasts holding fire bowls, the golden owl lectern, house banners, floating
-  candles, the enchanted ceiling) and the Entrance Hall with the moving Grand Staircase (gilt-framed portraits, suits of armour)
+- **Three interiors**: the Great Hall (stone beasts holding fire bowls, the golden owl lectern, house banners, floating
+  candles, the enchanted ceiling), the Entrance Hall with the moving Grand Staircase (gilt-framed portraits, suits of armour)
+  and Gryffindor Tower: the common room (red millefleur tapestries, the great hooded fireplace with the house crest, velvet
+  armchairs, Persian rugs, the brass chandelier, a game of wizard chess) and, up the spiral stair, the boys' dormitory
+  (four-poster beds with red curtains, trunks with initials, the iron stove in its wire guard)
 - **Four films that play in the page**: the camera tour by default; add `?cut=snitch` (an FPV flight following the Golden
   Snitch), `?cut=dusk` (dusk) or `?cut=magic` (a spell of light) to the address and press the tour button. Storyboards
   (in Chinese) are in [docs/](docs/).
 
 ## How it was made
 
-1. **References**: 217 photos from Wikimedia Commons, of the Leavesden miniature, the Great Hall set, the moving staircase
-   prop, Goathland station and locomotive 5972. Each photo's author and licence is in `ref/*/SOURCES.json`. The miniature was
+1. **References**: 234 photos from Wikimedia Commons, of the Leavesden miniature, the Great Hall and Gryffindor common room
+   sets, the moving staircase prop, Goathland station and locomotive 5972. Each photo's author and licence is in `ref/*/SOURCES.json`. The miniature was
    used up to the eighth film, so the design follows films six to eight.
 2. **One table**: `SITE` in `src/js/05-site.js` holds every building's position, name, sources and status. The map, the
    building list and the 3D scene are all drawn from it.
@@ -98,8 +101,8 @@ make it more detailed.
 
 Things to do:
 
-- **Interiors**: besides the Great Hall and the Grand Staircase, 12 rooms are not built yet: the Headmaster's office, the
-  Gryffindor common room and dormitory, the library and the Restricted Section, the Potions classroom, the top of the
+- **Interiors**: besides the Great Hall, the Grand Staircase and Gryffindor Tower, 11 rooms are not built yet:
+  the Headmaster's office, the library and the Restricted Section, the Potions classroom, the top of the
   Astronomy Tower, the Room of Requirement, the hospital wing ward, the Defence Against the Dark Arts classroom, the
   Transfiguration classroom, the Chamber of Secrets, the Slytherin common room and the trophy room
 - **Building detail**: keep checking the proportions, windows, roofs and carving of the 46 buildings against photos of the

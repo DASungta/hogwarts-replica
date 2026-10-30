@@ -1,7 +1,8 @@
 // ------------------------------------------------------------------ set joinery and glazing shared by the rooms
 // Leaded lights in metres: diamond quarries ~16 x 26 cm, clear with a faint tint, a few amber / green / blue panes in
 // the upper lights; daylight behind by day, a dark blue night. uv = position on the window in metres (x across, y up).
-M.hglass = procMat({ name: 'hglass', rgb: [1, 1, 1], rough: 0.1, uv: true, frag: /* glsl */ `
+// k: how bright the daylight behind it is (the Great Hall's tall windows 5.5, a small room's 2.2)
+const HGLASS_GLSL = (k) => /* glsl */ `
   vec2 q = UV;
   vec2 dq = vec2(q.x / 0.13 + q.y / 0.21, q.x / 0.13 - q.y / 0.21);
   vec2 cell = floor(dq), fd = abs(fract(dq) - 0.5);
@@ -18,9 +19,11 @@ M.hglass = procMat({ name: 'hglass', rgb: [1, 1, 1], rough: 0.1, uv: true, frag:
   vec3 day = sky * tint * (0.85 + 0.25 * cgVn(vec3(q * 0.8, 3.0))) * (0.985 + 0.03 * id);
   vec3 night = vec3(0.012, 0.022, 0.05) * tint;
   diffuseColor.rgb = vec3(0.015);
-  cgEmit = mix(day * 5.5, night, uNight) * (1.0 - lead);
+  cgEmit = mix(day * ${k.toFixed(2)}, night, uNight) * (1.0 - lead);
   cgSpec = 0.3; cgRough = mix(0.08, 0.5, lead);
-` });
+`;
+M.hglass = procMat({ name: 'hglass', rgb: [1, 1, 1], rough: 0.1, uv: true, frag: HGLASS_GLSL(5.5) });
+M.gglass = procMat({ name: 'gglass', rgb: [1, 1, 1], rough: 0.1, uv: true, frag: HGLASS_GLSL(0.9) });
 M.leather = procMat({ name: 'leather', rgb: [0.03, 0.075, 0.05], rough: 0.5, bump: 1, frag: /* glsl */ `
   float n = cgVn(P * 40.0); diffuseColor.rgb *= 0.8 + 0.35 * cgFbm3(P * 4.0); cgH = n * 0.0006;
 ` });

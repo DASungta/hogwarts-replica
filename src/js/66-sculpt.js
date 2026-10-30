@@ -657,4 +657,5 @@ async function prebuildFigures() {
   for (const n of ['eagle', 'dragon', 'boar', 'owl']) await sculptGeoAsync(n);
   await lecternGeoAsync();
   for (const k of ['sword', 'spear']) await knightGeoAsync(k);
+  await gcrSculptAsync();
 }

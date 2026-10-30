@@ -49,16 +49,29 @@ const SHOTS = {
   stairgal: { scene: 'stair', pos: [-10.2, 31.7, 10.2], target: [3, 26, -3], fov: 66 },
   stairhall: { scene: 'stair', pos: [0, 1.7, 9.5], target: [0, 4.6, -12], fov: 64 },
   stairflight: { scene: 'stair', pos: [-1.5, 11.7, 9.6], target: [-4, 15, -4], fov: 62 },
+  gryff: { scene: 'gryff', pos: [-2.8, 1.62, 3.3], target: [0.8, 2.5, -5.2], fov: 62 },
+  gryfffire: { scene: 'gryff', pos: [-2.15, 1.45, -0.1], target: [0.75, 2.4, -5.6], fov: 60 },
+  gryffwide: { scene: 'gryff', pos: [-0.9, 1.8, -2.4], target: [2.0, 2.2, 4.6], fov: 66 },
+  gryffstair: { scene: 'gryff', pos: [1.7, 1.6, 1.6], target: [4.1, 1.8, 4.1], fov: 56 },
+  gryffchess: { scene: 'gryff', pos: [2.0, 1.45, 0.6], target: [3.85, 0.8, -1.0], fov: 50 },
+  gdorm: { scene: 'gryff', pos: gdP(0, 0.25, 1.62, 1.25), target: gdP(5, 0.0, 1.35, 0.2), fov: 68 },
+  gdormbed: { scene: 'gryff', pos: gdP(2, 0.85, 1.3, 4.25), target: gdP(2, -0.15, 0.75, 1.7), fov: 58 },
+  gstairup: (() => {   // on the ninth tread of the turret stair: the steps winding up, the doorway down to the common room (65-gryffindor.js)
+    const c = gcrP(3, 0, 0, -(GCR.T + 1.45)), f = gcrF(3), e = Math.atan2(-f.d[1], -f.d[0]), da = (2 * Math.PI * 4 - 1.65) / 55, rise = GDM.Y / 56;
+    const a = e + 0.45 + 8.5 * da, b = a + 2.1, at = (q, r, y) => [c[0] + Math.cos(q) * r, y, c[2] + Math.sin(q) * r];
+    return { scene: 'gryff', pos: at(a, 0.7, rise * 9 + 1.55), target: at(b, 1.05, rise * 9 + 1.25), fov: 78 };
+  })(),
+  gstairtop: { scene: 'gryff', pos: gcrP(3, 0.1, GDM.Y + 1.62, -GCR.T - 1.05), target: gcrP(3, -0.1, GDM.Y + 1.35, 3.2), fov: 64 },
   lab: { scene: 'lab', pos: [0, 4.2, 9.5], target: [0, 4.4, 0], fov: 50 },
   labowl: { scene: 'lab', pos: [0.6, 1.6, 3.6], target: [0, 1.3, 1.5], fov: 40 },
 };
-const ROOM_NAME = { hall: '大礼堂', stair: '门厅与大楼梯' };
+const ROOM_NAME = { hall: '大礼堂', stair: '门厅与大楼梯', gryff: '格兰芬多塔（休息室与宿舍）' };
 let controls = null, shotName = Q.get('shot') || 'arrival';
 function applyCam(s) {
   camera.fov = s.fov; camera.position.set(...s.pos); camera.lookAt(...s.target); camera.updateProjectionMatrix();
   if (controls) { controls.target.set(...s.target); controls.update(); }
 }
-const INT_BUILD = { hall: buildHallInterior, stair: buildStairInterior };
+const INT_BUILD = { hall: buildHallInterior, stair: buildStairInterior, gryff: buildGryffindorCommon };
 function ensureInterior(key) {
   if (!key || INT[key] || !INT_BUILD[key]) return;
   const t0 = performance.now();
