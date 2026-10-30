@@ -718,7 +718,7 @@ const INTERIORS = [
   { id: 'gryffcommon', zh: '格兰芬多公共休息室', en: 'Gryffindor common room', status: 'built', src: 'SF', site: 'gryffindor', shot: 'gryff',
     note: '塔里的八角形房间：砂灰色毛石墙挂满红底千花挂毯（白色小兽、蓝色花岛、贵妇、狮子和独角兽举着新月纹旗），挂毯上挂着金框油画；北墙大石壁炉，锥形石烟罩一直升到天花板，上面刻着格兰芬多院徽，壁炉左边是带小窗的炉边座位；三个带窗座的深窗洞；红丝绒扶手椅、高背翼椅、搭着学院毯子的沙发、脚凳、波斯地毯、黄铜油灯和镂空铜吊灯；东南角的圆拱门里是上宿舍的螺旋石梯，南面是画像洞（胖夫人画像的背面）和布告栏，窗边一盘下到一半的巫师棋。' },
   { id: 'gryffdorm', zh: '格兰芬多男生宿舍', en: 'Gryffindor dormitory', status: 'built', src: 'SF', site: 'gryffindor', shot: 'gdorm',
-    note: '在休息室正上方，从休息室东南角的圆拱门顺着螺旋石梯转四圈上来，穿过一小段走廊进门。圆形塔室：石墙上一圈弯木梁，往上是木板墙和锥形木屋顶，两根粗糙的大梁交叉；中间一个带铁丝罩的铸铁炉，炉管通上屋顶；五张挂红丝绒帐子、里面是红底金星内帐的四柱床，床头的号牌，床尾刻着主人缩写的箱子（H.P、R.W……），罗恩床上是拼花毛毯；床边的柜子、镜柜、挂着校袍和学院围巾的衣钩；床与床之间是带窗台座的双联铅条窗。床头带灯罩的油灯、窗台上的蜡烛提灯，床尾板上搭着衬衫，满地糖纸；每个人的东西（原著）：哈利的鸟笼和扫帚、罗恩的火炮队海报和巧克力、纳威的米布米宝、迪安的足球海报和素描、西莫的爱尔兰海报。螺旋石梯上一路是别的年级的宿舍门，门上有年级铜牌，我们这间是 Sixth Years。' },
+    note: '在休息室正上方，从休息室东南角的圆拱门顺着螺旋石梯转四圈上来，穿过一小段走廊进门。圆形塔室：石墙上一圈弯木梁，往上是木板墙和锥形木屋顶，两根粗糙的大梁交叉；中间一个带铁丝罩的铸铁炉，炉管通上屋顶；五张挂红丝绒帐子、里面是红底金星内帐的四柱床，床头的号牌，床顶刻着床号（哈利的是 G·XXIV），床尾刻着主人缩写的箱子（HP、D.T……），迪安的床挨着哈利的，罗恩床上是拼花毛毯；床边的柜子、镜柜、挂着校袍和学院围巾的衣钩；床与床之间是带窗台座的双联铅条窗。床头带灯罩的油灯、窗台上的蜡烛提灯，床尾板上搭着衬衫，满地糖纸；每个人的东西（原著）：哈利的鸟笼和扫帚、罗恩的火炮队海报和巧克力、纳威的米布米宝、迪安的足球海报和素描、西莫的爱尔兰海报。螺旋石梯上一路是别的年级的宿舍门，门上有年级铜牌，我们这间是 Sixth Years。' },
   { id: 'library', zh: '图书馆与禁书区', en: 'Library & Restricted Section', status: 'todo', site: 'middle' },
   { id: 'potions', zh: '魔药课教室（地下）', en: 'Potions classroom', status: 'todo', site: 'terrace' },
   { id: 'astrotop', zh: '天文塔顶', en: 'Astronomy Tower top', status: 'todo', site: 'crown', note: '第六部邓布利多遇害的地方：圆形塔顶、铁环形的大天球仪。' },
@@ -8037,11 +8037,11 @@ M.gashlar = procMat({ name: 'gashlar', rgb: [1, 1, 1], rough: 0.9, bump: 1, uv: 
   joint = mix(joint, 0.1, smoothstep(0.03, 0.12, px));
   float bid = cgH21(vec2(id, row) + 0.37), bid2 = cgH21(vec2(id, row) + 9.1);
   float dorm = (1.0 - smoothstep(6.2, 6.8, length(P.xz))) * step(${(GCR.H + 1.0).toFixed(2)}, P.y);
-  vec3 c = mix(vec3(0.16, 0.13, 0.1), vec3(0.25, 0.215, 0.165), dorm) * mix(vec3(1.0), vec3(0.84, 0.9, 1.0), bid2 * 0.8) * (0.72 + 0.45 * bid);
+  vec3 c = mix(vec3(0.16, 0.13, 0.1), vec3(0.34, 0.3, 0.23), dorm) * mix(vec3(1.0), vec3(0.84, 0.9, 1.0), bid2 * 0.8 * (1.0 - 0.75 * dorm)) * (0.72 + 0.45 * bid);
   float pit = cgFbm3(P * 22.0), sp = cgVn(P * 90.0);
   c *= (0.85 + 0.25 * cgFbm3(P * 2.3 + bid * 5.0)) * (0.68 + 0.5 * pit) * (0.85 + 0.25 * sp) * (1.0 - 0.15 * arris);
   c *= 1.0 - 0.22 * smoothstep(0.55, 0.85, cgFbm3(P * vec3(0.6, 0.25, 0.6) + 2.0));   // grime run down the wall
-  c = mix(c, vec3(0.07, 0.062, 0.052) * (0.8 + 0.3 * cgVn(P * 30.0)), joint);
+  c = mix(c, mix(vec3(0.07, 0.062, 0.052), vec3(0.22, 0.2, 0.165), dorm) * (0.8 + 0.3 * cgVn(P * 30.0)), joint);
   diffuseColor.rgb *= c;
   cgH = (1.0 - joint) * 0.003 + pit * 0.0012 + sp * 0.0004; cgAO = mix(1.0, 0.55, joint); cgRough = 0.8 + 0.15 * pit;
 ` });
@@ -9188,7 +9188,13 @@ function gdBox(k, x0, x1, y0, y1, z0, z1, mat, bevel = 0.02) {
   const g = (bevel > 0 ? new RoundedBoxGeometry(w, h, d, 2, Math.min(bevel, w / 4, h / 4, d / 4)) : new THREE.BoxGeometry(w, h, d)).translate((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
   return gdPut(k, mat, uvPlanar(g));
 }
-const GDM_BEDS = [[2, 'H.P', 'CXXI'], [4, 'R.W', 'CXXII'], [6, 'N.L', 'CXXIII'], [8, 'D.T', 'CXXIV'], [10, 'S.F', 'CXXV']];   // facet, trunk initials, the number on the tester
+// facet, trunk initials, the number on the tester. The set (c00, c01, c14, c15): Harry's bed is G·XXIV, his trunk says HP
+// (no stop), Dean's D.T; Dean's bed is next to Harry's, on his left seen from the stove. Ron's on his other side (the films);
+// the other numbers run on round the room from Harry's
+// side: where the bed's washstand stands (its robes hang beyond it, beside the next window); Dean's and Harry's face each
+// other across the window between them, as in c15
+const GDM_BEDS = [[2, 'N.L', 'G·XXI', -1], [4, 'S.F', 'G·XXII', 1], [6, 'D.T', 'G·XXIII', 1], [8, 'HP', 'G·XXIV', -1], [10, 'R.W', 'G·XXV', 1]];
+const GDM_SILL = 1.15;   // the window ledges
 
 // ---- materials
 // the floor: wide oak boards, staggered butt joints, each board its own tone, worn paler where feet go
@@ -9216,11 +9222,11 @@ M.castIron = procMat({ name: 'castIron', rgb: [0.16, 0.16, 0.17], metal: 0.6, ro
   diffuseColor.rgb = mix(diffuseColor.rgb * (0.7 + 0.5 * n), vec3(0.2, 0.09, 0.04), r * 0.6); cgRough = 0.45 + 0.4 * r; cgMetal = 0.6 - 0.5 * r; cgH = n * 0.001;
 ` });
 // the stove's collar: slots all round (uv in metres), the fire's glow behind them when the lamps are lit
-M.grille = procMat({ name: 'grille', rgb: [0.16, 0.16, 0.17], metal: 0.6, rough: 0.5, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
-  float s = abs(fract(UV.x / 0.035) - 0.5), b = UV.y; if (s < 0.22 && b > 0.025 && b < 0.135) discard;
+M.grille = procMat({ name: 'grille', rgb: [0.2, 0.21, 0.23], metal: 0.35, rough: 0.55, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
+  float s = abs(fract(UV.x / 0.045) - 0.5), b = UV.y; if (s < 0.24 && b > 0.03 && b < 0.12) discard;
 ` });
 M.stoveGlow = procMat({ name: 'stoveGlow', rgb: [0.02, 0.01, 0.0], rough: 1, frag: /* glsl */ `
-  cgEmit = vec3(1.0, 0.35, 0.08) * (0.15 + 1.6 * uLamp) * (0.6 + 0.6 * cgFbm3(P * 30.0 + vec3(0.0, uTime * 0.6, 0.0)));
+  cgEmit = vec3(1.0, 0.35, 0.08) * (0.02 + 1.6 * uLamp) * (0.6 + 0.6 * cgFbm3(P * 30.0 + vec3(0.0, uTime * 0.6, 0.0)));
 ` });
 // bed curtains: deep red velvet, double sided; the inner ones red wool with gold stars (c11)
 M.curtain = procMat({ name: 'curtain', rgb: [0.15, 0.011, 0.015], rough: 0.85, side: THREE.DoubleSide, bump: 1, frag: /* glsl */ `
@@ -9247,7 +9253,7 @@ M.patch = procMat({ name: 'patch', rgb: [1, 1, 1], rough: 0.95, uv: true, bump: 
   float k = cgVn(vec3(UV * vec2(180.0, 90.0), h * 9.0));
   diffuseColor.rgb = col * (0.75 + 0.3 * k) * mix(0.6, 1.0, seam); cgH = k * 0.0008 + seam * 0.002;
 ` });
-M.trunk = procMat({ name: 'trunk', rgb: [0.2, 0.1, 0.05], rough: 0.55, bump: 1, frag: /* glsl */ `
+M.trunk = procMat({ name: 'trunk', rgb: [0.3, 0.165, 0.09], rough: 0.55, bump: 1, frag: /* glsl */ `
   float n = cgFbm3(P * 12.0), w = smoothstep(0.55, 0.8, cgFbm3(P * 5.0 + 2.0));
   diffuseColor.rgb *= (0.75 + 0.4 * n) * (1.0 + 0.5 * w); cgRough = 0.45 + 0.3 * w; cgH = n * 0.001;
 ` });
@@ -9297,8 +9303,8 @@ function robeGeo() {
 function gdBedParts() {
   const W = 0.6, Z1 = 2.1, top = 2.42, wood = [];
   for (const sx of [-1, 1]) for (const z of [0.06, Z1]) wood.push(new RoundedBoxGeometry(0.11, top, 0.11, 2, 0.015).translate(sx * W, top / 2, z));
-  for (const sx of [-1, 1]) { wood.push(new THREE.BoxGeometry(0.05, 0.5, Z1 - 0.1).translate(sx * (W - 0.06), 0.4, Z1 / 2 + 0.03)); wood.push(new THREE.BoxGeometry(0.07, 0.3, Z1 + 0.16).translate(sx * (W + 0.02), top - 0.17, Z1 / 2 + 0.03)); }
-  wood.push(new THREE.BoxGeometry(2 * W - 0.1, 0.6, 0.05).translate(0, 0.45, Z1 - 0.03));                                  // the foot board
+  for (const sx of [-1, 1]) { wood.push(new THREE.BoxGeometry(0.05, 0.36, Z1 - 0.1).translate(sx * (W - 0.06), 0.6, Z1 / 2 + 0.03)); wood.push(new THREE.BoxGeometry(0.07, 0.3, Z1 + 0.16).translate(sx * (W + 0.02), top - 0.17, Z1 / 2 + 0.03)); }
+  wood.push(new THREE.BoxGeometry(2 * W - 0.1, 0.36, 0.05).translate(0, 0.6, Z1 - 0.03));                                  // the foot board (the box open under it)
   wood.push(new THREE.BoxGeometry(2 * W - 0.1, 1.15, 0.06).translate(0, 0.72, 0.08));                                       // the head board
   for (const x of [-0.27, 0.27]) wood.push(new RoundedBoxGeometry(0.42, 0.62, 0.03, 1, 0.01).translate(x, 0.86, 0.12));    // its raised panels
   wood.push(new THREE.BoxGeometry(2 * W + 0.16, 0.3, 0.07).translate(0, top - 0.17, Z1 + 0.06), new THREE.BoxGeometry(2 * W + 0.16, 0.3, 0.07).translate(0, top - 0.17, 0.0));   // friezes
@@ -9311,17 +9317,17 @@ function gdBedParts() {
 // ---- the room (built into the common room's set; points: its lights list)
 function buildGryffDorm(sc, points) {
   const { R, T, Y } = GDM, L = GDM.L, Lo = 2 * (R + T) * Math.tan(Math.PI / 12), Rc = R / Math.cos(Math.PI / 12);
-  const doorO = { hw: 0.68, ys: 1.95, k: 0.56 }, winO = { hw: 0.66, ys: 1.5, k: 0.62, dy: 0.5 }, winI = { ...winO, hw: 0.44 };   // windows: two lights over a seat
+  const doorO = { hw: 0.68, ys: 1.95, k: 0.56 }, winO = { hw: 0.42, ys: 1.25, k: 0.62, dy: GDM_SILL }, winI = { ...winO, hw: 0.24 };   // windows: a narrow lancet, its sill a ledge
   // ---- the floor, the walls (stone to the wall plate), embrasures with leaded lancets, the doorway
   { const g = new THREE.CircleGeometry(R + T + 0.3, 48).rotateX(-Math.PI / 2).translate(0, Y, 0); put('gboards', g); }
-  const W1 = traceryWindow(2 * winI.hw, winI.ys, 'pointed', winI.k, 2, [1.0], { frame: 0.08, mull: 0.07, depth: 0.14 });
+  const W1 = traceryWindow(2 * winI.hw, winI.ys, 'pointed', winI.k, 1, [], { frame: 0.07, mull: 0.06, depth: 0.12 });
   for (let k = 0; k < 12; k++) {
     const sh = pathPts(new THREE.Shape(), [[-Lo / 2, -0.3], [Lo / 2, -0.3], [Lo / 2, GDM.wall + 0.05], [-Lo / 2, GDM.wall + 0.05]]);
     const hole = k === 0 ? doorO : k % 2 ? winO : null;
     if (hole) sh.holes.push(pathPts(new THREE.Path(), opn(hole), true));
     gdPut(k, 'gashlar', uvPlanar(new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 8 }).translate(0, 0, -T)));
     if (k % 2) {
-      gdPut(k, 'gashlar', loftGeo(opn(winO), 0, opn(winI), -0.75, ([x, y]) => [-x, -(y - 1.8), 0]));
+      gdPut(k, 'gashlar', loftGeo(opn(winO), 0, opn(winI), -0.75, ([x, y]) => [-x, -(y - 2.1), 0]));
       gdPut(k, 'gashlar', W1.stone.clone().translate(0, winI.dy, -0.82)); gdPut(k, 'dglass', W1.glass.clone().translate(0, winI.dy, -0.82));
     }
     // the wall plate: a moulded oak beam round the top of the stone (c15), and the boarded knee wall above it
@@ -9360,28 +9366,31 @@ function buildGryffDorm(sc, points) {
     beam([0, ty + 0.6, 0], [0, Y + GDM.apex - 0.1, 0], 0.3, 'oak');
     for (const [x, z] of [[1.8, 0], [-1.8, 0], [0, 1.8], [0, -1.8]]) beam([x, ty + (x ? 0.2 : 0.62), z], [0, ty + 2.0, 0], 0.18, 'oak');
   }
-  // ---- the stove (c14, c15): slab, cast-iron drum, slotted collar with the fire behind, domed lid, wire guard; the pipe
+  // ---- the stove (c14-c16): a square stone slab; a small cast-iron stove on four feet, its tall body with a cast door,
+  // a flange, a collar of upright slots with the fire behind, a wide domed lid pierced in rings and a knob; a round guard
+  // of coarse square mesh up to the collar; the pipe out of the back of the collar, an elbow, and straight up to the roof
   {
-    const c = [0, Y, 0];
-    put('gashlar', uvPlanar(new RoundedBoxGeometry(1.45, 0.07, 1.45, 1, 0.02).translate(c[0], Y + 0.035, c[2])));
-    const drum = [[0, 0.07], [0.4, 0.07], [0.41, 0.1], [0.37, 0.14], [0.34, 0.16]]; for (let i = 0; i <= 10; i++) drum.push([0.34 + (i % 2 ? 0.012 : 0), 0.18 + i * 0.05]);   // ribbed
-    drum.push([0.38, 0.7], [0.38, 0.73], [0.35, 0.74]);
-    put('castIron', lathe(drum, 40).translate(c[0], Y, c[2]));
-    put('castIron', lathe([[0.35, 0.96], [0.41, 0.97], [0.41, 1.0], [0.36, 1.02], [0.28, 1.06], [0.16, 1.09], [0.05, 1.1], [0.05, 1.14], [0.025, 1.16], [0, 1.16]], 40).translate(c[0], Y, c[2]));
-    const col = new THREE.CylinderGeometry(0.35, 0.35, 0.22, 56, 1, true), cu = col.attributes.uv; for (let i = 0; i < cu.count; i++) cu.setXY(i, cu.getX(i) * Math.PI * 2 * 0.35, cu.getY(i) * 0.16 - 0.03);
-    put('grille', col.translate(c[0], Y + 0.85, c[2]));
-    put('stoveGlow', new THREE.CylinderGeometry(0.32, 0.32, 0.21, 24).translate(c[0], Y + 0.85, c[2]));
-    const gd = new THREE.CylinderGeometry(0.64, 0.64, 1.0, 56, 1, true), gu = gd.attributes.uv; for (let i = 0; i < gu.count; i++) gu.setXY(i, gu.getX(i) * Math.PI * 2 * 0.64, gu.getY(i) * 1.0);
-    addMesh(gd.translate(c[0], Y + 0.07 + 0.5, c[2]), M.ironMesh, { cast: false, recv: false });
-    for (const y of [0.09, 1.07]) put('castIron', new THREE.TorusGeometry(0.64, y > 1 ? 0.022 : 0.014, 8, 56).rotateX(Math.PI / 2).translate(c[0], Y + y, c[2]));
-    for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; put('castIron', new THREE.CylinderGeometry(0.01, 0.01, 1.0, 6).translate(c[0] + Math.cos(a) * 0.64, Y + 0.57, c[2] + Math.sin(a) * 0.64)); }
-    const pipe = [[-0.22, 0.93, -0.22], [-0.36, 0.97, -0.36], [-0.44, 1.12, -0.44], [-0.44, 1.55, -0.44], [-0.44, GDM.apex - 0.4, -0.44]].map(([x, y, z]) => new THREE.Vector3(c[0] + x, Y + y, c[2] + z));
-    put('castIron', new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pipe, false, 'centripetal'), 64, 0.075, 16));
-    for (let y = 1.6; y < GDM.apex - 0.6; y += 1.1) put('castIron', new THREE.CylinderGeometry(0.085, 0.085, 0.06, 16).translate(c[0] - 0.44, Y + y, c[2] - 0.44));
-    // a towel and a scarf hung over the guard (c14)
-    const tm = xf([0.56, Y + 1.03, 0.28], Math.atan2(0.56, 0.28) + Math.PI / 2);
-    put('linen', merge([new RoundedBoxGeometry(0.34, 0.03, 0.12, 1, 0.01).translate(0, 0.05, 0.05), new RoundedBoxGeometry(0.34, 0.42, 0.02, 1, 0.008).translate(0, -0.15, 0.12), new RoundedBoxGeometry(0.34, 0.26, 0.02, 1, 0.008).translate(0, -0.08, -0.02)]).applyMatrix4(tm));
-    LAMPS.push({ room: GCR_ROOM, p: [c[0], Y + 0.84, c[2]], c: [1.0, 0.35, 0.1].map((v) => v * 1.6), r: 2.2, see: 30 });
+    const c = [0, Y, 0], h0 = 0.08, pa = (3 * Math.PI) / 4 + (6.2 * Math.PI) / 6, p = [Math.sin(pa), -Math.cos(pa)];   // the pipe leaves toward Dean's bed (c15)
+    put('gslab', new RoundedBoxGeometry(1.2, h0, 1.2, 2, 0.025).translate(c[0], Y + h0 / 2, c[2]));
+    for (let i = 0; i < 4; i++) { const a = Math.PI / 4 + (i * Math.PI) / 2; put('stoveIron', new RoundedBoxGeometry(0.07, 0.11, 0.1, 1, 0.025).rotateY(-a).translate(c[0] + Math.cos(a) * 0.2, Y + h0 + 0.055, c[2] + Math.sin(a) * 0.2)); }
+    put('stoveIron', lathe([[0, 0.15], [0.21, 0.15], [0.235, 0.17], [0.24, 0.2], [0.25, 0.22], [0.25, 0.66], [0.265, 0.68], [0.28, 0.7], [0.28, 0.725], [0.255, 0.735], [0, 0.735]].map(([r, y]) => [r, y + h0]), 48).translate(c[0], Y, c[2]));
+    { const f = gdF(1), a = Math.atan2(f.d[0], f.d[1]);   // the cast door on the front, toward the room's door side
+      put('stoveIron', merge([new RoundedBoxGeometry(0.2, 0.28, 0.03, 2, 0.012), new THREE.SphereGeometry(0.018, 10, 8).translate(0.07, 0, 0.022)]).translate(0, 0, 0.245).applyMatrix4(xf([c[0], Y + h0 + 0.42, c[2]], a))); }
+    const col = new THREE.CylinderGeometry(0.255, 0.255, 0.15, 64, 1, true), cu = col.attributes.uv; for (let i = 0; i < cu.count; i++) cu.setXY(i, cu.getX(i) * Math.PI * 2 * 0.255, cu.getY(i) * 0.15);
+    put('grille', col.translate(c[0], Y + h0 + 0.81, c[2]));
+    put('stoveGlow', new THREE.CylinderGeometry(0.24, 0.24, 0.14, 24).translate(c[0], Y + h0 + 0.81, c[2]));
+    put('stoveIron', new THREE.TorusGeometry(0.258, 0.008, 6, 48).rotateX(Math.PI / 2).translate(c[0], Y + h0 + 0.886, c[2]));
+    put('stoveLid', lathe([[0.24, 0.888], [0.33, 0.892], [0.338, 0.905], [0.32, 0.925], [0.26, 0.95], [0.16, 0.968], [0.05, 0.975], [0, 0.975]].map(([r, y]) => [r, y + h0]), 64).translate(c[0], Y, c[2]));
+    put('stoveIron', lathe([[0, 0.975], [0.022, 0.975], [0.012, 1.0], [0.024, 1.02], [0.012, 1.045], [0, 1.045]].map(([r, y]) => [r, y + h0]), 16).translate(c[0], Y, c[2]));
+    const gr = 0.46, gh = 0.8, gd = new THREE.CylinderGeometry(gr, gr, gh, 72, 1, true), gu = gd.attributes.uv; for (let i = 0; i < gu.count; i++) gu.setXY(i, gu.getX(i) * Math.PI * 2 * gr, gu.getY(i) * gh);
+    addMesh(gd.translate(c[0], Y + h0 + gh / 2, c[2]), M.gcage, { cast: false, recv: false });
+    put('cageWire', new THREE.TorusGeometry(gr, 0.011, 8, 72).rotateX(Math.PI / 2).translate(c[0], Y + h0 + gh, c[2]));
+    put('cageWire', new THREE.TorusGeometry(gr, 0.007, 6, 72).rotateX(Math.PI / 2).translate(c[0], Y + h0 + 0.02, c[2]));
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + 0.3; put('cageWire', new THREE.CylinderGeometry(0.006, 0.006, gh, 6).translate(c[0] + Math.cos(a) * gr, Y + h0 + gh / 2, c[2] + Math.sin(a) * gr)); }
+    const top = GDM.apex - 0.4, pipe = [[0.1, 0.8], [0.3, 0.8], [0.39, 0.83], [0.43, 0.93], [0.43, 1.2], [0.43, top]].map(([r, y]) => new THREE.Vector3(c[0] + p[0] * r, Y + h0 + y, c[2] + p[1] * r));
+    put('stoveIron', new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pipe, false, 'centripetal', 0.2), 80, 0.06, 18));
+    for (let y = 1.4; y < top - 0.3; y += 1.0) put('stoveIron', new THREE.CylinderGeometry(0.068, 0.068, 0.05, 18).translate(c[0] + p[0] * 0.43, Y + h0 + y, c[2] + p[1] * 0.43));
+    LAMPS.push({ room: GCR_ROOM, p: [c[0], Y + h0 + 0.8, c[2]], c: [1.0, 0.35, 0.1].map((q) => q * 1.6), r: 2.2, see: 30 });
   }
   // ---- the beds and their corners
   const bedGeo = gdBedParts(), beds = [], curtains = [], stars = [], mats = [], pads = [], wools = [], patches = [], trunks = [], cups = [], hooks = [];
@@ -9391,7 +9400,7 @@ function buildGryffDorm(sc, points) {
     P.push(new THREE.BoxGeometry(0.46, 0.62, 0.22).translate(0, 1.75, 0.11), new THREE.ExtrudeGeometry(pathPts(new THREE.Shape(), [[-0.27, 0], [0.27, 0], [0, 0.16]]), { depth: 0.24, bevelEnabled: false }).translate(0, 2.06, -0.01));   // the cabinet and its pediment
     P.push(new THREE.BoxGeometry(0.5, 0.05, 0.25).translate(0, 2.06, 0.11), new THREE.BoxGeometry(0.5, 0.04, 0.24).translate(0, 1.43, 0.11));
     return merge(P); })();
-  for (const [k, ini, num] of GDM_BEDS) {
+  for (const [k, ini, num, side] of GDM_BEDS) {
     const m = gdM(k, 0, 0, 0.42);
     beds.push(m);
     // the curtains: red velvet tied back at the four posts, star curtains drawn half along the sides near the head
@@ -9402,12 +9411,14 @@ function buildGryffDorm(sc, points) {
     mats.push(m.clone().multiply(xf([0, 0.62, 1.07], 0, 1)));
     pads.push(m.clone().multiply(xf([0, 0.8, 0.38], 0, [1.55, 1.0, 1.0], -Math.PI / 2 + 0.45)));
     (ini === 'R.W' ? patches : wools).push(m.clone().multiply(xf([0, 0.75, 1.36], 0, 1)));
-    trunks.push(m.clone().multiply(xf([0, 0, 2.55], 0, 1)));
-    cups.push(gdM(k, 0.96, 0, 0.0));
-    hooks.push(gdM(k, -0.96, 0, 0.0));
+    trunks.push(m.clone().multiply(xf([0, 0, 2.31], 0, 1)));
+    cups.push(gdM(k, side * 0.96, 0, 0.0));
+    hooks.push(gdM(k + side, -side * 0.85, 0, 0.0));
+    put('fwood', uvPlanar(new THREE.BoxGeometry(0.52, 2.45, 0.05).translate(side * 0.96, 1.32, 0.03)).applyMatrix4(gdM(k)));   // the panelling behind the washstand
+    put('fwood', uvPlanar(new THREE.BoxGeometry(0.52, 1.0, 0.04).translate(-side * 0.85, 1.72, 0.02)).applyMatrix4(gdM(k + side)));   // and behind the robes
     // the bed's number on the tester frieze, the owner's initials on the trunk
-    addMesh(new THREE.PlaneGeometry(0.42, 0.16).applyMatrix4(m.clone().multiply(xf([0, 2.25, 2.2], 0, 1))), letterMat(num, '#d8c8a0', 52), { cast: false });
-    addMesh(new THREE.PlaneGeometry(0.3, 0.11).applyMatrix4(m.clone().multiply(xf([0, 0.24, 2.802], 0, 1))), letterMat(ini, '#e8dcc4', 70), { cast: false });
+    addMesh(new THREE.PlaneGeometry(0.42, 0.16).applyMatrix4(m.clone().multiply(xf([0, 2.25, 2.2], 0, 1))), letterMat(num, '#d8c8a0', 46), { cast: false });
+    addMesh(new THREE.PlaneGeometry(0.3, 0.11).applyMatrix4(m.clone().multiply(xf([-0.1, 0.31, 2.542], 0, 1))), letterMat(ini, ini === 'HP' ? '#d6b46a' : '#e6dcc6', 78, 'bold'), { cast: false });
   }
   addInst(bedGeo, M.fwood, beds);
   addInst(curtainGeo(0.34, 2.14, 3.5, 0.045, 0.6), M.curtain, curtains, null, { cast: true });
@@ -9416,12 +9427,15 @@ function buildGryffDorm(sc, points) {
   addInst(gcrSculpt('pillow'), M.linen, pads);
   const blanket = uvPlanar(merge([new RoundedBoxGeometry(1.16, 0.06, 1.42, 2, 0.025).translate(0, 0.03, 0), ...[-1, 1].map((s) => new RoundedBoxGeometry(0.03, 0.3, 1.42, 1, 0.012).translate(s * 0.565, -0.12, 0)), new RoundedBoxGeometry(1.14, 0.03, 0.22, 1, 0.012).translate(0, 0.065, -0.62)]));
   addInst(blanket, M.wool, wools); addInst(blanket, M.patch, patches);
-  // trunks (c12): leather body, a lid line, brass corners, two straps, a side handle
-  addInst(new RoundedBoxGeometry(0.88, 0.44, 0.48, 2, 0.03).translate(0, 0.22, 0), M.trunk, trunks);
-  const tb = []; for (const sx of [-1, 1]) for (const sy of [0.02, 0.42]) for (const sz of [-1, 1]) tb.push(new THREE.BoxGeometry(0.07, 0.05, 0.07).translate(sx * 0.42, sy, sz * 0.22));
-  tb.push(new THREE.BoxGeometry(0.9, 0.012, 0.5).translate(0, 0.34, 0));
+  // trunks (c12, c15): a tan leather case with rounded edges, a lid seam, brass corner caps and studs, a leather handle on
+  // the front, the initials painted large over it
+  addInst(new RoundedBoxGeometry(0.8, 0.4, 0.46, 3, 0.045).translate(0, 0.2, 0), M.trunk, trunks);
+  const tb = []; for (const sx of [-1, 1]) for (const sy of [0.035, 0.365]) for (const sz of [-1, 1]) tb.push(new RoundedBoxGeometry(0.075, 0.075, 0.075, 1, 0.02).translate(sx * 0.37, sy, sz * 0.195));
+  for (let i = 0; i < 9; i++) tb.push(new THREE.SphereGeometry(0.006, 6, 4).translate(-0.3 + i * 0.075, 0.27, 0.232));
+  for (const x of [-0.09, 0.09]) tb.push(new THREE.BoxGeometry(0.035, 0.05, 0.01).translate(x, 0.16, 0.232));
+  tb.push(new THREE.BoxGeometry(0.05, 0.06, 0.01).translate(0, 0.28, 0.233));   // the lock
   addInst(merge(tb), M.brass, trunks, null, { cast: false });
-  addInst(merge([-0.24, 0.24].map((x) => new THREE.BoxGeometry(0.05, 0.46, 0.5).translate(x, 0.225, 0))), M.strap, trunks, null, { cast: false });
+  addInst(merge([new THREE.BoxGeometry(0.81, 0.012, 0.47).translate(0, 0.28, 0), new THREE.TorusGeometry(0.075, 0.012, 6, 16, Math.PI).rotateZ(Math.PI).translate(0, 0.165, 0.245)]), M.strap, trunks, null, { cast: false });
   // cupboards with a washbowl and jug, the pedimented mirror cabinet over them; hook rails with robes and scarves
   addInst(cupGeo, M.fwood, cups);
   addInst(new THREE.PlaneGeometry(0.33, 0.46), M.mirror, cups.map((m) => m.clone().multiply(xf([0, 1.75, 0.225], 0, 1))), null, { cast: false });
@@ -9445,8 +9459,8 @@ function buildGryffDorm(sc, points) {
   }
   addInst(GD_LAMP.brass, M.brass, lamps); addInst(GD_LAMP.chimney, M.globe, lamps, null, { cast: false }); addInst(GD_LAMP.shade, M.tole, lamps, null, { cast: false });
   for (const m of lamps) { v.set(0, 0.2, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.62, 0.3].map((q) => q * 2.4), r: 3.4, halo: 0.1, hk: 0.45, see: 30 }); }
-  addInst(gcrChair(), M.fwood, [gdM(2, -0.98, 0, 1.15, 0.3), gdM(8, 0.95, 0, 1.2, -0.2)]);
-  put('wicker', (() => { const g = lathe([[0, 0], [0.13, 0], [0.16, 0.32], [0.155, 0.33], [0.125, 0.01]], 24); const u = g.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i), u.getY(i) * 0.33); return g; })().applyMatrix4(gdM(4, 0.95, 0, 0.75)));
+  addInst(gcrChair(), M.fwood, [gdM(7, 0.05, 0, 0.3, 0.1), gdM(3, -0.1, 0, 0.32, -0.15)]);
+  put('wicker', (() => { const g = lathe([[0, 0], [0.13, 0], [0.16, 0.32], [0.155, 0.33], [0.125, 0.01]], 24); const u = g.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i), u.getY(i) * 0.33); return g; })().applyMatrix4(gdM(7, -0.55, 0, 0.3)));
   // the dormitory's light: two fills (no shadow, short), the moon or sun through the lancets comes from the set's sun
   for (const [x, z] of [[1.3, 0.9], [-1.3, -0.9]]) { const p = new THREE.PointLight(new THREE.Color(1.0, 0.66, 0.38), 0, 6, 1.6); p.position.set(x, Y + 2.6, z); p.userData = { d: 0.6, n: 1.3 }; sc.add(p); points.push(p); }
   gdDress();   // the boys' things (65c-gryffdress.js)
@@ -9481,6 +9495,27 @@ M.tole = procMat({ name: 'tole', rgb: [1, 1, 1], metal: 0.4, rough: 0.4, side: T
   if (gl_FrontFacing) diffuseColor.rgb = vec3(0.03, 0.055, 0.04) * (0.8 + 0.3 * cgFbm3(P * 30.0));
   else { diffuseColor.rgb = vec3(0.72, 0.7, 0.6); cgEmit = vec3(1.0, 0.72, 0.4) * (0.04 + 0.8 * uLamp); cgMetal = 0.0; cgRough = 0.8; }
 ` });
+// the stove: cast iron painted a dull blue-grey (c14, c16); its lid pierced in rings, the fire's glow in the holes
+M.stoveIron = procMat({ name: 'stoveIron', rgb: [0.2, 0.21, 0.23], metal: 0.35, rough: 0.55, bump: 1, frag: /* glsl */ `
+  float n = cgFbm3(P * 14.0), w = smoothstep(0.6, 0.8, cgFbm3(P * 5.0 + 3.0));
+  diffuseColor.rgb *= (0.75 + 0.45 * n) * (1.0 + 0.4 * w); cgRough = 0.5 + 0.25 * w; cgH = n * 0.001;
+` });
+M.stoveLid = procMat({ name: 'stoveLid', rgb: [0.21, 0.22, 0.24], metal: 0.35, rough: 0.55, frag: /* glsl */ `
+  float r = length(P.xz), a = atan(P.z, P.x), ri = floor(r / 0.045), rg = fract(r / 0.045), ca = fract(a / 6.2832 * (12.0 + ri * 8.0));
+  float hole = (1.0 - smoothstep(0.2, 0.3, abs(rg - 0.5))) * (1.0 - smoothstep(0.18, 0.3, abs(ca - 0.5))) * step(0.07, r) * step(r, 0.29);
+  diffuseColor.rgb *= (0.75 + 0.4 * cgFbm3(P * 20.0)) * (1.0 - 0.85 * hole);
+  cgEmit = vec3(1.0, 0.4, 0.1) * hole * (0.03 + 0.5 * uLamp);
+` });
+M.gslab = procMat({ name: 'gslab', rgb: [0.42, 0.39, 0.34], rough: 0.85, bump: 1, frag: /* glsl */ `
+  float n = cgFbm3(P * 6.0); diffuseColor.rgb *= 0.8 + 0.3 * n; diffuseColor.rgb *= 1.0 - 0.3 * smoothstep(0.55, 0.8, cgFbm3(P * 2.0 + 5.0)); cgH = n * 0.002;
+` });
+// the guard: welded steel mesh in 42 mm squares of 3.5 mm wire (c14), seen through by its coverage
+M.gcage = procMat({ name: 'gcage', rgb: [0.3, 0.3, 0.31], metal: 0.6, rough: 0.4, uv: true, side: THREE.DoubleSide, std: { transparent: true, depthWrite: false }, frag: /* glsl */ `
+  vec2 g = abs(fract(UV / 0.042) - 0.5); float px = length(fwidth(UV / 0.042));
+  float wire = smoothstep(0.458 - px - 0.01, 0.458 + px, max(g.x, g.y));
+  diffuseColor.a = mix(wire, 0.17, smoothstep(0.15, 0.45, px));
+` });
+M.cageWire = procMat({ name: 'cageWire', rgb: [0.3, 0.3, 0.31], metal: 0.6, rough: 0.4 });
 M.gwax = procMat({ name: 'gwax', rgb: [0.62, 0.56, 0.44], rough: 0.5 });
 M.gflame = procMat({ name: 'gflame', rgb: [0, 0, 0], rough: 1, frag: /* glsl */ `cgEmit = vec3(1.0, 0.62, 0.25) * (0.4 + 3.0 * uLamp);` });
 M.lglass = procMat({ name: 'lglass', rgb: [0.6, 0.55, 0.45], rough: 0.15, std: { transparent: true, depthWrite: false }, frag: /* glsl */ `
@@ -9578,6 +9613,15 @@ function posterMat(kind) {
       for (const s of [-1, 1]) { g.beginPath(); g.ellipse(w / 2 + s * 18, 150, 8, 5, 0, 0, 7); g.stroke(); }
       g.beginPath(); g.moveTo(w / 2 - 12, 190); g.lineTo(w / 2, 200); g.lineTo(w / 2 + 12, 190); g.stroke(); g.beginPath(); g.moveTo(w / 2, 200); g.lineTo(w / 2, 212); g.stroke();
       g.fillStyle = 'rgba(40,38,36,0.6)'; font(18, 'italic'); g.fillText('D. Thomas', w - 60, h - 24);
+    } else if (kind === 'pennant') {   // a Gryffindor pennant: a red felt triangle, a gold border, a gold lion
+      g.clearRect(0, 0, w, h);
+      g.fillStyle = '#e0b84e'; g.beginPath(); g.moveTo(0, 0); g.lineTo(w, 0); g.lineTo(w / 2, h); g.closePath(); g.fill();
+      g.fillStyle = '#7c0f12'; g.beginPath(); g.moveTo(14, 10); g.lineTo(w - 14, 10); g.lineTo(w / 2, h - 26); g.closePath(); g.fill();
+      g.fillStyle = '#e0b84e'; g.fillRect(14, 10, w - 28, 26);
+      g.save(); g.translate(w / 2, 120); g.fillStyle = '#d9b04a';
+      g.beginPath(); g.ellipse(0, 0, 34, 22, 0, 0, 7); g.fill(); g.beginPath(); g.arc(-34, -18, 16, 0, 7); g.fill();
+      for (const x of [-26, -10, 12, 26]) g.fillRect(x - 4, 10, 8, 30);
+      g.lineWidth = 6; g.strokeStyle = '#d9b04a'; g.beginPath(); g.moveTo(32, -6); g.quadraticCurveTo(58, -30, 50, -50); g.stroke(); g.restore();
     } else if (kind === 'photo') {   // Harry: an old photograph of his mother and father (PS: Hagrid's album)
       const gr = g.createRadialGradient(w / 2, h / 2, 40, w / 2, h / 2, 220); gr.addColorStop(0, '#9a7c55'); gr.addColorStop(1, '#3b2a18');
       g.fillStyle = gr; g.fillRect(0, 0, w, h);
@@ -9589,7 +9633,7 @@ function posterMat(kind) {
       g.fillStyle = 'rgba(255,240,210,0.08)'; for (let i = 0; i < 300; i++) g.fillRect(R() * w, R() * h, 1.5, 1.5);
     }
   });
-  return procMat({ name: 'poster', rgb: [1, 1, 1], rough: 0.8, std: { map: t } });
+  return procMat({ name: 'poster', rgb: [1, 1, 1], rough: 0.8, std: kind === 'pennant' ? { map: t, alphaTest: 0.5, side: THREE.DoubleSide } : { map: t } });
 }
 
 // ---- pieces
@@ -9673,23 +9717,24 @@ function gdBroom() {
 
 // ---- the dressing of the dormitory (called from buildGryffDorm)
 function gdDress() {
+  const B = Object.fromEntries(GDM_BEDS.map(([k, ini]) => [ini.replace('.', ''), k]));   // each boy's bed facet: B.HP, B.RW, B.NL, B.DT, B.SF
   const R = rng('gdress'), bed = (k) => gdM(k, 0, 0, 0.42), at = (m, p, ry = 0, s = 1, rx = 0, rz = 0) => m.clone().multiply(xf(p, ry, s, rx, rz)), v = new THREE.Vector3();
   const lantern = (m) => {
     addInst(GD_LANTERN.tin, M.castIron, [m]); addInst(GD_LANTERN.candle, M.gwax, [m], null, { cast: false });
     addInst(GD_LANTERN.flame, M.gflame, [m], null, { cast: false, recv: false }); addInst(GD_LANTERN.glass, M.lglass, [m], null, { cast: false, recv: false });
     v.set(0, 0.12, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.58, 0.26].map((q) => q * 1.1), r: 2.0, halo: 0.07, hk: 0.4, see: 20 });
   };
-  const seat = (k, u, w = -0.3, turn = 0) => gdM(k, u, 0.5, w, turn);   // on a window seat (the embrasure's sill, 65b)
+  const seat = (k, u, w = -0.3, turn = 0) => gdM(k, u, GDM_SILL, w, turn);   // on a window ledge (the embrasure's sill, 65b)
   // candle lanterns on three window seats (PoA)
-  lantern(seat(7, -0.1)); lantern(seat(9, 0.15)); lantern(seat(11, -0.05));
+  lantern(seat(1, -0.06, -0.25)); lantern(seat(5, 0.06, -0.25)); lantern(seat(11, -0.04, -0.25));
   // Hedwig's cage on the seat between Harry's bed and Ron's, a white feather by it
-  addInst(gdCageGeo(), M.brass, [seat(3, 0.12, -0.32, 0.4)]);
-  addInst(new THREE.PlaneGeometry(0.03, 0.13).rotateX(-Math.PI / 2), M.linen, [seat(3, -0.22, -0.22, 0.9)].map((m) => at(m, [0, 0.006, 0])), null, { cast: false });
-  // on the seat beside Harry's bed: a photograph of his parents in a frame, and books
-  { const m = seat(1, 0.18, -0.25, 0.3); put('fwood', new THREE.BoxGeometry(0.2, 0.26, 0.02).translate(0, 0.13, 0).applyMatrix4(at(m, [0, 0, 0], 0, 1, -0.2))); addMesh(new THREE.PlaneGeometry(0.16, 0.22).translate(0, 0.13, 0.011).applyMatrix4(at(m, [0, 0, 0], 0, 1, -0.2)), posterMat('photo'), { cast: false }); }
+  addInst(gdCageGeo(), M.brass, [seat(B.HP + 1, 0.0, -0.33, 0.4)]);
+  addInst(new THREE.PlaneGeometry(0.03, 0.13).rotateX(-Math.PI / 2), M.linen, [seat(B.HP + 1, 0.2, -0.08, 0.9)].map((m) => at(m, [0, 0.006, 0])), null, { cast: false });
+  // on the seat on Harry's other side (between him and Dean): a photograph of his parents in a frame, and books
+  { const m = seat(B.HP - 1, 0.1, -0.38, 0.2); put('fwood', new THREE.BoxGeometry(0.17, 0.22, 0.02).translate(0, 0.11, 0).applyMatrix4(at(m, [0, 0, 0], 0, 1, -0.2))); addMesh(new THREE.PlaneGeometry(0.135, 0.185).translate(0, 0.11, 0.011).applyMatrix4(at(m, [0, 0, 0], 0, 1, -0.2)), posterMat('photo'), { cast: false }); }
   // Neville's Mimbulus mimbletonia in its pot on the seat by his bed
   {
-    const m = seat(5, 0.15, -0.3), P = [];
+    const m = seat(B.NL + 1, 0.04, -0.3), P = [];
     put('gpot', lathe([[0, 0], [0.055, 0], [0.072, 0.11], [0.08, 0.115], [0.078, 0.125], [0.066, 0.12], [0, 0.11]], 20).applyMatrix4(m));
     for (let i = 0; i < 7; i++) { const a = R() * 6.28, r = i ? 0.03 + R() * 0.03 : 0, s = 0.035 + R() * 0.02; P.push(new THREE.SphereGeometry(s, 14, 10).scale(1, 1.25, 1).translate(Math.cos(a) * r, 0.14 + s + (i ? R() * 0.05 : 0.03), Math.sin(a) * r)); }
     for (let i = 0; i < 26; i++) { const a = R() * 6.28, y = 0.15 + R() * 0.12; P.push(new THREE.SphereGeometry(0.007 + R() * 0.005, 6, 4).translate(Math.cos(a) * (0.05 + R() * 0.02), y, Math.sin(a) * (0.05 + R() * 0.02))); }
@@ -9697,38 +9742,40 @@ function gdDress() {
   }
   // the boys' things at their beds and on their panels (the back panel: the wall frame of the bed's facet)
   const panel = (k, x, y, w, h, mat, rz = 0) => addMesh(new THREE.PlaneGeometry(w, h).applyMatrix4(gdM(k).multiply(xf([x, y, 0.082], 0, 1, 0, rz))), mat, { cast: false });
-  panel(4, -0.45, 1.82, 0.34, 0.47, posterMat('cannons'), 0.03);
-  panel(6, -0.45, 1.84, 0.32, 0.44, posterMat('herbology'), -0.02);
-  panel(8, -0.45, 1.82, 0.34, 0.47, posterMat('westham'), -0.03);
-  { const sk = posterMat('sketch'); panel(8, 0.4, 1.93, 0.17, 0.23, sk, 0.08); panel(8, 0.52, 1.72, 0.17, 0.23, sk, -0.06); }
-  panel(10, -0.45, 1.82, 0.34, 0.47, posterMat('ireland'), 0.02);
+  panel(B.RW, -0.45, 1.82, 0.34, 0.47, posterMat('cannons'), 0.03);
+  panel(B.NL, -0.45, 1.84, 0.32, 0.44, posterMat('herbology'), -0.02);
+  panel(B.DT, -0.45, 1.82, 0.34, 0.47, posterMat('westham'), -0.03);
+  { const sk = posterMat('sketch'); panel(B.DT, 0.4, 1.93, 0.17, 0.23, sk, 0.08); panel(B.DT, 0.52, 1.72, 0.17, 0.23, sk, -0.06); }
+  panel(B.SF, -0.45, 1.82, 0.34, 0.47, posterMat('ireland'), 0.02);
+  { const pn = posterMat('pennant'); panel(B.HP, -0.45, 1.84, 0.3, 0.44, pn, 0.02); panel(B.RW, 0.45, 1.84, 0.3, 0.44, pn, -0.03); }
   {   // Seamus's rosette: pleated green rings and two ribbon tails
     const g = new THREE.CircleGeometry(0.075, 48, 0), p = g.attributes.position;
     for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), a = Math.atan2(y, x), r = Math.hypot(x, y); p.setZ(i, 0.006 * Math.sin(a * 24) * (r / 0.075)); }
     g.computeVertexNormals();
     const tails = [-1, 1].map((s) => new THREE.PlaneGeometry(0.035, 0.12).translate(0, -0.08, -0.002).applyMatrix4(new THREE.Matrix4().makeRotationZ(s * 0.25)));
-    addInst(merge([g, new THREE.CircleGeometry(0.035, 24).translate(0, 0, 0.008), ...tails]), M.knit, [gdM(10).multiply(xf([0.45, 1.88, 0.09], 0, 1))], [[0.05, 0.3, 0.13]], { cast: false });
+    addInst(merge([g, new THREE.CircleGeometry(0.035, 24).translate(0, 0, 0.008), ...tails]), M.knit, [gdM(B.SF).multiply(xf([0.45, 1.88, 0.09], 0, 1))], [[0.05, 0.3, 0.13]], { cast: false });
   }
   // clothes: checked shirts and a T-shirt over foot boards (c11, c12), jumpers on beds (c13); Ron's maroon one has his R
   const plaidL = [], plaidC = [], knitL = [], knitC = [];
-  const drape = (k, x, w, l1, l2, seed, list, cols, col) => { list.push(at(bed(k), [x, 0.765, 2.07], (R() - 0.5) * 0.12)); cols.push(col); return drapeGeo(w, l1, l2, 0.04, seed); };
-  addInst(drape(2, -0.2, 0.42, 0.28, 0.42, 1, plaidL, plaidC, [0.42, 0.05, 0.05]), M.plaid, plaidL.splice(0), plaidC.splice(0));
-  addInst(drape(8, 0.22, 0.4, 0.3, 0.38, 2, plaidL, plaidC, [0.08, 0.2, 0.12]), M.plaid, plaidL.splice(0), plaidC.splice(0));
-  addInst(drape(4, 0.24, 0.38, 0.22, 0.34, 3, knitL, knitC, [0.3, 0.3, 0.31]), M.knit, knitL.splice(0), knitC.splice(0));
-  addInst(drape(6, -0.25, 0.4, 0.26, 0.3, 4, knitL, knitC, [0.12, 0.14, 0.2]), M.knit, knitL.splice(0), knitC.splice(0));
-  addInst(lumpGeo(0.46, 0.08, 0.34, 1), M.knit, [at(bed(4), [-0.12, 0.8, 1.45], 0.3)], [[0.2, 0.025, 0.035]]);
-  addMesh(new THREE.PlaneGeometry(0.13, 0.13).rotateX(-Math.PI / 2).applyMatrix4(at(bed(4), [-0.12, 0.848, 1.45], 0.3)), letterMat('R', '#c99a34', 92), { cast: false });
-  addInst(lumpGeo(0.42, 0.07, 0.3, 2), M.knit, [at(bed(10), [0.12, 0.92, 0.5], -0.4)], [[0.19, 0.12, 0.07]]);
-  // towels over the stove's guard (c14, c16)
+  const drape = (k, z, w, l1, l2, seed, list, cols, col, sx = -1) => { list.push(at(bed(k), [sx * 0.565, 0.795, z], sx * -Math.PI / 2 + (R() - 0.5) * 0.12)); cols.push(col); return drapeGeo(w, l1, l2, 0.035, seed); };
+  addInst(drape(B.HP, 1.45, 0.34, 0.3, 0.36, 1, plaidL, plaidC, [0.42, 0.05, 0.05]), M.plaid, plaidL.splice(0), plaidC.splice(0));
+  addInst(drape(B.HP, 1.85, 0.3, 0.25, 0.3, 5, knitL, knitC, [0.42, 0.43, 0.44]), M.knit, knitL.splice(0), knitC.splice(0));
+  addInst(drape(B.DT, 1.6, 0.36, 0.28, 0.34, 2, plaidL, plaidC, [0.08, 0.2, 0.12], 1), M.plaid, plaidL.splice(0), plaidC.splice(0));
+  addInst(drape(B.DT, 0.7, 0.36, 0.2, 0.3, 6, knitL, knitC, [0.62, 0.6, 0.55]), M.knit, knitL.splice(0), knitC.splice(0));
+  addInst(drape(B.RW, 1.7, 0.34, 0.22, 0.32, 3, knitL, knitC, [0.3, 0.3, 0.31], 1), M.knit, knitL.splice(0), knitC.splice(0));
+  addInst(drape(B.NL, 1.5, 0.38, 0.26, 0.3, 4, knitL, knitC, [0.12, 0.14, 0.2]), M.knit, knitL.splice(0), knitC.splice(0));
+  addInst(lumpGeo(0.46, 0.08, 0.34, 1), M.knit, [at(bed(B.RW), [-0.12, 0.8, 1.45], 0.3)], [[0.2, 0.025, 0.035]]);
+  addMesh(new THREE.PlaneGeometry(0.13, 0.13).rotateX(-Math.PI / 2).applyMatrix4(at(bed(B.RW), [-0.12, 0.848, 1.45], 0.3)), letterMat('R', '#c99a34', 92), { cast: false });
+  addInst(lumpGeo(0.42, 0.07, 0.3, 2), M.knit, [at(bed(B.SF), [0.12, 0.92, 0.5], -0.4)], [[0.19, 0.12, 0.07]]);
+  // grey knitted socks hung over the guard's rim to dry (c14, c16)
   {
-    const tw = merge([new RoundedBoxGeometry(0.3, 0.03, 0.12, 1, 0.01).translate(0, 0.05, 0.05), new RoundedBoxGeometry(0.3, 0.4, 0.02, 1, 0.008).translate(0, -0.14, 0.12), new RoundedBoxGeometry(0.3, 0.24, 0.02, 1, 0.008).translate(0, -0.07, -0.02)]);
     const L = [], C = [];
-    for (const [a, c] of [[2.4, [0.42, 0.42, 0.4]], [3.9, [0.33, 0.33, 0.34]], [5.2, [0.5, 0.49, 0.45]]]) { const x = Math.cos(a) * 0.62, z = Math.sin(a) * 0.62; L.push(xf([x, GDM.Y + 1.03, z], Math.atan2(x, z))); C.push(c); }
-    addInst(tw, M.knit, L, C);
+    for (const [a, c] of [[2.3, [0.4, 0.4, 0.4]], [2.75, [0.47, 0.47, 0.46]], [3.9, [0.34, 0.34, 0.36]], [5.3, [0.44, 0.43, 0.41]]]) { const x = Math.cos(a) * 0.46, z = Math.sin(a) * 0.46; L.push(xf([x, GDM.Y + 0.88, z], Math.atan2(x, z))); C.push(c); }
+    addInst(drapeGeo(0.085, 0.16, 0.34, 0.013, 9), M.knit, L, C, { cast: false });
   }
   // sweets: Ron's opened box of chocolates and wrappers on his bed and the floor (HBP); frogs and beans on Seamus's bed (PoA)
   {
-    const box = [], boxC = [], foil = [], foilC = [], b4 = bed(4), b10 = bed(10);
+    const box = [], boxC = [], foil = [], foilC = [], b4 = bed(B.RW), b10 = bed(B.SF);
     addInst(merge([new THREE.CylinderGeometry(0.1, 0.1, 0.045, 28).translate(0, 0.0225, 0)]), M.card, [at(b4, [0.25, 0.79, 0.95], 0.3)], [[0.62, 0.12, 0.25]]);
     addInst(new THREE.CylinderGeometry(0.105, 0.105, 0.03, 28).translate(0, 0.015, 0), M.card, [at(b4, [0.42, 0.8, 1.2], 0.9, 1, 0.25, 0.1)], [[0.7, 0.16, 0.3]]);
     const sweets = [[0.38, 0.12, 0.62], [0.55, 0.42, 0.08], [0.15, 0.4, 0.2], [0.6, 0.08, 0.1], [0.75, 0.66, 0.2]];
@@ -9743,9 +9790,9 @@ function gdDress() {
   }
   // Harry's broom against the foot of his bed, his old potions book and a folded map on the trunk
   {
-    const B = gdBroom(), b2 = bed(2), base = new THREE.Vector3(0.92, 0.0, 2.34), top = new THREE.Vector3(0.69, 1.8, 2.16), dir = top.clone().sub(base).normalize();
+    const BR = gdBroom(), b2 = bed(B.HP), base = new THREE.Vector3(0.92, 0.0, 2.34), top = new THREE.Vector3(0.69, 1.8, 2.16), dir = top.clone().sub(base).normalize();
     const m = b2.clone().multiply(new THREE.Matrix4().compose(base, new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir), new THREE.Vector3(1, 1, 1)));
-    put('fwood', B.handle.applyMatrix4(m)); put('twigs', B.tail.applyMatrix4(m)); put('brass', B.bands.applyMatrix4(m));
+    put('fwood', BR.handle.applyMatrix4(m)); put('twigs', BR.tail.applyMatrix4(m)); put('brass', BR.bands.applyMatrix4(m));
     addInst(new THREE.BoxGeometry(1, 1, 1), M.bookCover, [at(b2, [-0.15, 0.82, 0.75], 0.4, [0.17, 0.035, 0.24])], [[0.16, 0.1, 0.05]]);
     addInst(new THREE.BoxGeometry(0.97, 0.86, 0.94), M.pages, [at(b2, [-0.15, 0.82, 0.75], 0.4, [0.17, 0.035, 0.24])], null, { cast: false });
     put('parchment', new THREE.BoxGeometry(0.2, 0.012, 0.14).applyMatrix4(at(b2, [0.12, 0.45, 2.55], -0.3)));
@@ -9754,7 +9801,7 @@ function gdDress() {
   {
     const BL = [], BC = [], COLS = [[0.2, 0.05, 0.04], [0.06, 0.1, 0.05], [0.12, 0.08, 0.04], [0.05, 0.06, 0.12], [0.22, 0.17, 0.08]];
     const stack = (m, n) => { let y = 0; for (let i = 0; i < n; i++) { const h = 0.03 + R() * 0.03; BL.push(at(m, [(R() - 0.5) * 0.03, y + h / 2, (R() - 0.5) * 0.03], (R() - 0.5) * 0.5, [0.18 + R() * 0.07, h, 0.13 + R() * 0.06])); BC.push(COLS[Math.floor(R() * COLS.length)]); y += h; } };
-    stack(at(bed(6), [-0.15, 0.44, 2.55]), 4); stack(seat(1, -0.2, -0.3), 3); stack(at(bed(8), [0.2, 0.44, 2.55]), 2);
+    stack(at(bed(B.NL), [-0.15, 0.44, 2.55]), 4); stack(seat(B.HP - 1, -0.1, -0.15), 3); stack(at(bed(B.DT), [0.2, 0.44, 2.55]), 2);
     addInst(new THREE.BoxGeometry(1, 1, 1), M.bookCover, BL, BC); addInst(new THREE.BoxGeometry(0.97, 0.86, 0.94).translate(0.02, 0, 0), M.pages, BL, null, { cast: false });
   }
   // shoes by each bed
@@ -12785,12 +12832,12 @@ function gwPaths() {
   add(null, g(3, 0, top + e, GCR.A - GDM.R - GDM.T, 0.75));
   add('in', d(0, 0.05, e, 0.35, 0.7));
   add('look', d(0, 0.1, e, 2.15, 0, 2.6));
-  add(null, ring(52, 1.12, 0.55));
-  add(null, ring(70, 1.08, 0.55));
-  add('harry', ring(88, 1.08, 0, 2.6));
-  add(null, ring(115, 1.08, 0.55));
-  add('ron', ring(140, 1.08, 0, 1.2));
-  add('end', ring(160, 1.08, 0, 4.8));
+  add(null, ring(25, 1.12, 0.55));                // round the stove the other way: Ron's bed, Harry's, then Dean's (65b)
+  add('ron', ring(5, 1.08, 0, 1.6));
+  add(null, ring(-25, 1.08, 0.55));
+  add('harry', ring(-58, 1.08, 0, 2.6));
+  add(null, ring(-82, 1.08, 0.55));
+  add('end', ring(-102, 1.08, 0, 4.8));
   return { R: gwRoute(P), W, c, ent0, top, rpa: rise / da };   // rpa: the stair's rise per radian
 }
 function gryffWalkShots() {
@@ -12810,10 +12857,10 @@ function gryffWalkShots() {
     keys.push({ t, look: [c[0] + Math.cos(a) * 0.7, p[1] + 1.15 * rpa - 0.42, c[2] + Math.sin(a) * 0.7] });
   }
   keys.push({ t: Ta('landed') + 0.3, ahead: 0.08 }, { t: Ta('passage') - 0.4, look: [0, top + 1.4, 0] }, { t: Ta('in'), look: [0, top + 1.1, 0] },
-    { t: Ta('look') + 0.5, look: gdP(10, 0, 1.3, 1.6) }, { t: Ta('look') + 1.5, look: gdP(10, 0, 1.3, 1.6) }, { t: Td('look') - 0.2, look: gdP(2, 0, 1.3, 1.7) },
-    { t: Td('look') + 1.2, look: gdP(2, 0.2, 1.0, 1.4) }, { t: Ta('harry') + 0.2, look: gdP(2, 0, 0.75, 2.4) }, { t: Td('harry') - 0.3, look: gdP(2, 0, 0.95, 1.6) },
-    { t: Ta('ron') - 0.3, look: gdP(4, 0, 0.95, 1.7) }, { t: Td('ron'), look: gdP(4, 0, 1.1, 1.4) },
-    { t: Ta('end') + 0.6, look: gdP(6, 0, 1.6, 0.9) }, { t: Ta('end') + 3.4, look: [0.3, top + 4.4, 0.1] }, { t: R.T1, look: [0.3, top + 4.6, 0.1] });
+    { t: Ta('look') + 0.5, look: gdP(2, 0, 1.3, 1.6) }, { t: Ta('look') + 1.5, look: gdP(2, 0, 1.3, 1.6) }, { t: Td('look') - 0.2, look: gdP(10, 0, 1.3, 1.7) },
+    { t: Td('look') + 1.2, look: gdP(10, 0.1, 1.1, 1.6) }, { t: Ta('ron') + 0.2, look: gdP(10, 0, 0.95, 1.7) }, { t: Td('ron') - 0.1, look: gdP(10, -0.25, 1.45, 0.6) },
+    { t: Ta('harry') + 0.2, look: gdP(8, 0, 0.75, 2.4) }, { t: Td('harry') - 0.3, look: gdP(8, 0, 0.95, 1.6) },
+    { t: Ta('end') + 0.6, look: gdP(6, 0, 1.6, 0.9) }, { t: Ta('end') + 3.4, look: [-0.1, top + 4.4, -0.3] }, { t: R.T1, look: [-0.1, top + 4.6, -0.3] });
   const look = gwLook(R, keys);
   const END = R.T1 + 0.4;
   const shot = { name: 'gryffwalk', t0: 0, dur: END, scene: 'gryff', night: true, fleet: false, bloom: 0.08, fadeIn: 1.4, fadeOut: 2.2,
@@ -12885,8 +12932,8 @@ const SHOTS = {
   gryffwide: { scene: 'gryff', pos: [-0.9, 1.8, -2.4], target: [2.0, 2.2, 4.6], fov: 66 },
   gryffstair: { scene: 'gryff', pos: [1.7, 1.6, 1.6], target: [4.1, 1.8, 4.1], fov: 56 },
   gryffchess: { scene: 'gryff', pos: [2.0, 1.45, 0.6], target: [3.85, 0.8, -1.0], fov: 50 },
-  gdorm: { scene: 'gryff', pos: gdP(0, 0.25, 1.62, 1.25), target: gdP(5, 0.0, 1.35, 0.2), fov: 68 },
-  gdormbed: { scene: 'gryff', pos: gdP(2, 0.85, 1.3, 4.25), target: gdP(2, -0.15, 0.75, 1.7), fov: 58 },
+  gdorm: { scene: 'gryff', pos: gdP(1, -0.4, 1.3, 2.6), target: gdP(7, 0.9, 1.0, 0.8), fov: 60 },   // as c15: Dean's bed and Harry's either side of the stove
+  gdormbed: { scene: 'gryff', pos: gdP(8, 0.85, 1.3, 4.25), target: gdP(8, -0.15, 0.75, 1.7), fov: 58 },
   gstairup: (() => {   // on the ninth tread of the turret stair: the steps winding up, the doorway down to the common room (65-gryffindor.js)
     const c = gcrP(3, 0, 0, -(GCR.T + 1.45)), f = gcrF(3), e = Math.atan2(-f.d[1], -f.d[0]), da = (2 * Math.PI * 4 - 1.65) / 55, rise = GDM.Y / 56;
     const a = e + 0.45 + 8.5 * da, b = a + 2.1, at = (q, r, y) => [c[0] + Math.cos(q) * r, y, c[2] + Math.sin(q) * r];
@@ -12896,8 +12943,8 @@ const SHOTS = {
     const { c, ent0 } = GT, da = (2 * Math.PI * 4 - 1.65) / 55, rise = GDM.Y / 56, mid = (i) => ent0 + 0.45 + (i + 0.5) * da, at = (q, r, y) => [c[0] + Math.cos(q) * r, y, c[2] + Math.sin(q) * r];
     return { scene: 'gryff', pos: at(mid(20.2), 0.55, rise * 21 + 1.55), target: at(mid(24.3), 1.35, rise * 25 + 1.0), fov: 72, near: 0.08 };
   })(),
-  gdormron: { scene: 'gryff', pos: gdP(4, 0.35, 1.5, 3.4), target: gdP(4, -0.15, 1.15, 0.3), fov: 58 },
-  gdormwin: { scene: 'gryff', pos: gdP(2, 0.9, 1.25, 1.9), target: gdP(3, 0.05, 0.8, -0.2), fov: 55 },
+  gdormron: { scene: 'gryff', pos: gdP(10, 0.35, 1.5, 3.4), target: gdP(10, -0.15, 1.15, 0.3), fov: 58 },
+  gdormwin: { scene: 'gryff', pos: gdP(10, -0.95, 1.45, 1.7), target: gdP(9, 0.0, 1.35, -0.3), fov: 55 },
   gstairtop: { scene: 'gryff', pos: gcrP(3, 0.1, GDM.Y + 1.62, -GCR.T - 1.05), target: gcrP(3, -0.1, GDM.Y + 1.35, 3.2), fov: 64, near: 0.08 },
   lab: { scene: 'lab', pos: [0, 4.2, 9.5], target: [0, 4.4, 0], fov: 50 },
   labowl: { scene: 'lab', pos: [0.6, 1.6, 3.6], target: [0, 1.3, 1.5], fov: 40 },

@@ -81,11 +81,11 @@ M.gashlar = procMat({ name: 'gashlar', rgb: [1, 1, 1], rough: 0.9, bump: 1, uv: 
   joint = mix(joint, 0.1, smoothstep(0.03, 0.12, px));
   float bid = cgH21(vec2(id, row) + 0.37), bid2 = cgH21(vec2(id, row) + 9.1);
   float dorm = (1.0 - smoothstep(6.2, 6.8, length(P.xz))) * step(${(GCR.H + 1.0).toFixed(2)}, P.y);
-  vec3 c = mix(vec3(0.16, 0.13, 0.1), vec3(0.25, 0.215, 0.165), dorm) * mix(vec3(1.0), vec3(0.84, 0.9, 1.0), bid2 * 0.8) * (0.72 + 0.45 * bid);
+  vec3 c = mix(vec3(0.16, 0.13, 0.1), vec3(0.34, 0.3, 0.23), dorm) * mix(vec3(1.0), vec3(0.84, 0.9, 1.0), bid2 * 0.8 * (1.0 - 0.75 * dorm)) * (0.72 + 0.45 * bid);
   float pit = cgFbm3(P * 22.0), sp = cgVn(P * 90.0);
   c *= (0.85 + 0.25 * cgFbm3(P * 2.3 + bid * 5.0)) * (0.68 + 0.5 * pit) * (0.85 + 0.25 * sp) * (1.0 - 0.15 * arris);
   c *= 1.0 - 0.22 * smoothstep(0.55, 0.85, cgFbm3(P * vec3(0.6, 0.25, 0.6) + 2.0));   // grime run down the wall
-  c = mix(c, vec3(0.07, 0.062, 0.052) * (0.8 + 0.3 * cgVn(P * 30.0)), joint);
+  c = mix(c, mix(vec3(0.07, 0.062, 0.052), vec3(0.22, 0.2, 0.165), dorm) * (0.8 + 0.3 * cgVn(P * 30.0)), joint);
   diffuseColor.rgb *= c;
   cgH = (1.0 - joint) * 0.003 + pit * 0.0012 + sp * 0.0004; cgAO = mix(1.0, 0.55, joint); cgRough = 0.8 + 0.15 * pit;
 ` });

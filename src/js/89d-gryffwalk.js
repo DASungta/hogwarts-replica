@@ -83,12 +83,12 @@ function gwPaths() {
   add(null, g(3, 0, top + e, GCR.A - GDM.R - GDM.T, 0.75));
   add('in', d(0, 0.05, e, 0.35, 0.7));
   add('look', d(0, 0.1, e, 2.15, 0, 2.6));
-  add(null, ring(52, 1.12, 0.55));
-  add(null, ring(70, 1.08, 0.55));
-  add('harry', ring(88, 1.08, 0, 2.6));
-  add(null, ring(115, 1.08, 0.55));
-  add('ron', ring(140, 1.08, 0, 1.2));
-  add('end', ring(160, 1.08, 0, 4.8));
+  add(null, ring(25, 1.12, 0.55));                // round the stove the other way: Ron's bed, Harry's, then Dean's (65b)
+  add('ron', ring(5, 1.08, 0, 1.6));
+  add(null, ring(-25, 1.08, 0.55));
+  add('harry', ring(-58, 1.08, 0, 2.6));
+  add(null, ring(-82, 1.08, 0.55));
+  add('end', ring(-102, 1.08, 0, 4.8));
   return { R: gwRoute(P), W, c, ent0, top, rpa: rise / da };   // rpa: the stair's rise per radian
 }
 function gryffWalkShots() {
@@ -108,10 +108,10 @@ function gryffWalkShots() {
     keys.push({ t, look: [c[0] + Math.cos(a) * 0.7, p[1] + 1.15 * rpa - 0.42, c[2] + Math.sin(a) * 0.7] });
   }
   keys.push({ t: Ta('landed') + 0.3, ahead: 0.08 }, { t: Ta('passage') - 0.4, look: [0, top + 1.4, 0] }, { t: Ta('in'), look: [0, top + 1.1, 0] },
-    { t: Ta('look') + 0.5, look: gdP(10, 0, 1.3, 1.6) }, { t: Ta('look') + 1.5, look: gdP(10, 0, 1.3, 1.6) }, { t: Td('look') - 0.2, look: gdP(2, 0, 1.3, 1.7) },
-    { t: Td('look') + 1.2, look: gdP(2, 0.2, 1.0, 1.4) }, { t: Ta('harry') + 0.2, look: gdP(2, 0, 0.75, 2.4) }, { t: Td('harry') - 0.3, look: gdP(2, 0, 0.95, 1.6) },
-    { t: Ta('ron') - 0.3, look: gdP(4, 0, 0.95, 1.7) }, { t: Td('ron'), look: gdP(4, 0, 1.1, 1.4) },
-    { t: Ta('end') + 0.6, look: gdP(6, 0, 1.6, 0.9) }, { t: Ta('end') + 3.4, look: [0.3, top + 4.4, 0.1] }, { t: R.T1, look: [0.3, top + 4.6, 0.1] });
+    { t: Ta('look') + 0.5, look: gdP(2, 0, 1.3, 1.6) }, { t: Ta('look') + 1.5, look: gdP(2, 0, 1.3, 1.6) }, { t: Td('look') - 0.2, look: gdP(10, 0, 1.3, 1.7) },
+    { t: Td('look') + 1.2, look: gdP(10, 0.1, 1.1, 1.6) }, { t: Ta('ron') + 0.2, look: gdP(10, 0, 0.95, 1.7) }, { t: Td('ron') - 0.1, look: gdP(10, -0.25, 1.45, 0.6) },
+    { t: Ta('harry') + 0.2, look: gdP(8, 0, 0.75, 2.4) }, { t: Td('harry') - 0.3, look: gdP(8, 0, 0.95, 1.6) },
+    { t: Ta('end') + 0.6, look: gdP(6, 0, 1.6, 0.9) }, { t: Ta('end') + 3.4, look: [-0.1, top + 4.4, -0.3] }, { t: R.T1, look: [-0.1, top + 4.6, -0.3] });
   const look = gwLook(R, keys);
   const END = R.T1 + 0.4;
   const shot = { name: 'gryffwalk', t0: 0, dur: END, scene: 'gryff', night: true, fleet: false, bloom: 0.08, fadeIn: 1.4, fadeOut: 2.2,

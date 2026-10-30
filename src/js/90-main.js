@@ -54,8 +54,8 @@ const SHOTS = {
   gryffwide: { scene: 'gryff', pos: [-0.9, 1.8, -2.4], target: [2.0, 2.2, 4.6], fov: 66 },
   gryffstair: { scene: 'gryff', pos: [1.7, 1.6, 1.6], target: [4.1, 1.8, 4.1], fov: 56 },
   gryffchess: { scene: 'gryff', pos: [2.0, 1.45, 0.6], target: [3.85, 0.8, -1.0], fov: 50 },
-  gdorm: { scene: 'gryff', pos: gdP(0, 0.25, 1.62, 1.25), target: gdP(5, 0.0, 1.35, 0.2), fov: 68 },
-  gdormbed: { scene: 'gryff', pos: gdP(2, 0.85, 1.3, 4.25), target: gdP(2, -0.15, 0.75, 1.7), fov: 58 },
+  gdorm: { scene: 'gryff', pos: gdP(1, -0.4, 1.3, 2.6), target: gdP(7, 0.9, 1.0, 0.8), fov: 60 },   // as c15: Dean's bed and Harry's either side of the stove
+  gdormbed: { scene: 'gryff', pos: gdP(8, 0.85, 1.3, 4.25), target: gdP(8, -0.15, 0.75, 1.7), fov: 58 },
   gstairup: (() => {   // on the ninth tread of the turret stair: the steps winding up, the doorway down to the common room (65-gryffindor.js)
     const c = gcrP(3, 0, 0, -(GCR.T + 1.45)), f = gcrF(3), e = Math.atan2(-f.d[1], -f.d[0]), da = (2 * Math.PI * 4 - 1.65) / 55, rise = GDM.Y / 56;
     const a = e + 0.45 + 8.5 * da, b = a + 2.1, at = (q, r, y) => [c[0] + Math.cos(q) * r, y, c[2] + Math.sin(q) * r];
@@ -65,8 +65,8 @@ const SHOTS = {
     const { c, ent0 } = GT, da = (2 * Math.PI * 4 - 1.65) / 55, rise = GDM.Y / 56, mid = (i) => ent0 + 0.45 + (i + 0.5) * da, at = (q, r, y) => [c[0] + Math.cos(q) * r, y, c[2] + Math.sin(q) * r];
     return { scene: 'gryff', pos: at(mid(20.2), 0.55, rise * 21 + 1.55), target: at(mid(24.3), 1.35, rise * 25 + 1.0), fov: 72, near: 0.08 };
   })(),
-  gdormron: { scene: 'gryff', pos: gdP(4, 0.35, 1.5, 3.4), target: gdP(4, -0.15, 1.15, 0.3), fov: 58 },
-  gdormwin: { scene: 'gryff', pos: gdP(2, 0.9, 1.25, 1.9), target: gdP(3, 0.05, 0.8, -0.2), fov: 55 },
+  gdormron: { scene: 'gryff', pos: gdP(10, 0.35, 1.5, 3.4), target: gdP(10, -0.15, 1.15, 0.3), fov: 58 },
+  gdormwin: { scene: 'gryff', pos: gdP(10, -0.95, 1.45, 1.7), target: gdP(9, 0.0, 1.35, -0.3), fov: 55 },
   gstairtop: { scene: 'gryff', pos: gcrP(3, 0.1, GDM.Y + 1.62, -GCR.T - 1.05), target: gcrP(3, -0.1, GDM.Y + 1.35, 3.2), fov: 64, near: 0.08 },
   lab: { scene: 'lab', pos: [0, 4.2, 9.5], target: [0, 4.4, 0], fov: 50 },
   labowl: { scene: 'lab', pos: [0.6, 1.6, 3.6], target: [0, 1.3, 1.5], fov: 40 },

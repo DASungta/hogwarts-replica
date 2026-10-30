@@ -22,7 +22,13 @@ function gdBox(k, x0, x1, y0, y1, z0, z1, mat, bevel = 0.02) {
   const g = (bevel > 0 ? new RoundedBoxGeometry(w, h, d, 2, Math.min(bevel, w / 4, h / 4, d / 4)) : new THREE.BoxGeometry(w, h, d)).translate((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
   return gdPut(k, mat, uvPlanar(g));
 }
-const GDM_BEDS = [[2, 'H.P', 'CXXI'], [4, 'R.W', 'CXXII'], [6, 'N.L', 'CXXIII'], [8, 'D.T', 'CXXIV'], [10, 'S.F', 'CXXV']];   // facet, trunk initials, the number on the tester
+// facet, trunk initials, the number on the tester. The set (c00, c01, c14, c15): Harry's bed is G·XXIV, his trunk says HP
+// (no stop), Dean's D.T; Dean's bed is next to Harry's, on his left seen from the stove. Ron's on his other side (the films);
+// the other numbers run on round the room from Harry's
+// side: where the bed's washstand stands (its robes hang beyond it, beside the next window); Dean's and Harry's face each
+// other across the window between them, as in c15
+const GDM_BEDS = [[2, 'N.L', 'G·XXI', -1], [4, 'S.F', 'G·XXII', 1], [6, 'D.T', 'G·XXIII', 1], [8, 'HP', 'G·XXIV', -1], [10, 'R.W', 'G·XXV', 1]];
+const GDM_SILL = 1.15;   // the window ledges
 
 // ---- materials
 // the floor: wide oak boards, staggered butt joints, each board its own tone, worn paler where feet go
@@ -50,11 +56,11 @@ M.castIron = procMat({ name: 'castIron', rgb: [0.16, 0.16, 0.17], metal: 0.6, ro
   diffuseColor.rgb = mix(diffuseColor.rgb * (0.7 + 0.5 * n), vec3(0.2, 0.09, 0.04), r * 0.6); cgRough = 0.45 + 0.4 * r; cgMetal = 0.6 - 0.5 * r; cgH = n * 0.001;
 ` });
 // the stove's collar: slots all round (uv in metres), the fire's glow behind them when the lamps are lit
-M.grille = procMat({ name: 'grille', rgb: [0.16, 0.16, 0.17], metal: 0.6, rough: 0.5, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
-  float s = abs(fract(UV.x / 0.035) - 0.5), b = UV.y; if (s < 0.22 && b > 0.025 && b < 0.135) discard;
+M.grille = procMat({ name: 'grille', rgb: [0.2, 0.21, 0.23], metal: 0.35, rough: 0.55, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
+  float s = abs(fract(UV.x / 0.045) - 0.5), b = UV.y; if (s < 0.24 && b > 0.03 && b < 0.12) discard;
 ` });
 M.stoveGlow = procMat({ name: 'stoveGlow', rgb: [0.02, 0.01, 0.0], rough: 1, frag: /* glsl */ `
-  cgEmit = vec3(1.0, 0.35, 0.08) * (0.15 + 1.6 * uLamp) * (0.6 + 0.6 * cgFbm3(P * 30.0 + vec3(0.0, uTime * 0.6, 0.0)));
+  cgEmit = vec3(1.0, 0.35, 0.08) * (0.02 + 1.6 * uLamp) * (0.6 + 0.6 * cgFbm3(P * 30.0 + vec3(0.0, uTime * 0.6, 0.0)));
 ` });
 // bed curtains: deep red velvet, double sided; the inner ones red wool with gold stars (c11)
 M.curtain = procMat({ name: 'curtain', rgb: [0.15, 0.011, 0.015], rough: 0.85, side: THREE.DoubleSide, bump: 1, frag: /* glsl */ `
@@ -81,7 +87,7 @@ M.patch = procMat({ name: 'patch', rgb: [1, 1, 1], rough: 0.95, uv: true, bump: 
   float k = cgVn(vec3(UV * vec2(180.0, 90.0), h * 9.0));
   diffuseColor.rgb = col * (0.75 + 0.3 * k) * mix(0.6, 1.0, seam); cgH = k * 0.0008 + seam * 0.002;
 ` });
-M.trunk = procMat({ name: 'trunk', rgb: [0.2, 0.1, 0.05], rough: 0.55, bump: 1, frag: /* glsl */ `
+M.trunk = procMat({ name: 'trunk', rgb: [0.3, 0.165, 0.09], rough: 0.55, bump: 1, frag: /* glsl */ `
   float n = cgFbm3(P * 12.0), w = smoothstep(0.55, 0.8, cgFbm3(P * 5.0 + 2.0));
   diffuseColor.rgb *= (0.75 + 0.4 * n) * (1.0 + 0.5 * w); cgRough = 0.45 + 0.3 * w; cgH = n * 0.001;
 ` });
@@ -131,8 +137,8 @@ function robeGeo() {
 function gdBedParts() {
   const W = 0.6, Z1 = 2.1, top = 2.42, wood = [];
   for (const sx of [-1, 1]) for (const z of [0.06, Z1]) wood.push(new RoundedBoxGeometry(0.11, top, 0.11, 2, 0.015).translate(sx * W, top / 2, z));
-  for (const sx of [-1, 1]) { wood.push(new THREE.BoxGeometry(0.05, 0.5, Z1 - 0.1).translate(sx * (W - 0.06), 0.4, Z1 / 2 + 0.03)); wood.push(new THREE.BoxGeometry(0.07, 0.3, Z1 + 0.16).translate(sx * (W + 0.02), top - 0.17, Z1 / 2 + 0.03)); }
-  wood.push(new THREE.BoxGeometry(2 * W - 0.1, 0.6, 0.05).translate(0, 0.45, Z1 - 0.03));                                  // the foot board
+  for (const sx of [-1, 1]) { wood.push(new THREE.BoxGeometry(0.05, 0.36, Z1 - 0.1).translate(sx * (W - 0.06), 0.6, Z1 / 2 + 0.03)); wood.push(new THREE.BoxGeometry(0.07, 0.3, Z1 + 0.16).translate(sx * (W + 0.02), top - 0.17, Z1 / 2 + 0.03)); }
+  wood.push(new THREE.BoxGeometry(2 * W - 0.1, 0.36, 0.05).translate(0, 0.6, Z1 - 0.03));                                  // the foot board (the box open under it)
   wood.push(new THREE.BoxGeometry(2 * W - 0.1, 1.15, 0.06).translate(0, 0.72, 0.08));                                       // the head board
   for (const x of [-0.27, 0.27]) wood.push(new RoundedBoxGeometry(0.42, 0.62, 0.03, 1, 0.01).translate(x, 0.86, 0.12));    // its raised panels
   wood.push(new THREE.BoxGeometry(2 * W + 0.16, 0.3, 0.07).translate(0, top - 0.17, Z1 + 0.06), new THREE.BoxGeometry(2 * W + 0.16, 0.3, 0.07).translate(0, top - 0.17, 0.0));   // friezes
@@ -145,17 +151,17 @@ function gdBedParts() {
 // ---- the room (built into the common room's set; points: its lights list)
 function buildGryffDorm(sc, points) {
   const { R, T, Y } = GDM, L = GDM.L, Lo = 2 * (R + T) * Math.tan(Math.PI / 12), Rc = R / Math.cos(Math.PI / 12);
-  const doorO = { hw: 0.68, ys: 1.95, k: 0.56 }, winO = { hw: 0.66, ys: 1.5, k: 0.62, dy: 0.5 }, winI = { ...winO, hw: 0.44 };   // windows: two lights over a seat
+  const doorO = { hw: 0.68, ys: 1.95, k: 0.56 }, winO = { hw: 0.42, ys: 1.25, k: 0.62, dy: GDM_SILL }, winI = { ...winO, hw: 0.24 };   // windows: a narrow lancet, its sill a ledge
   // ---- the floor, the walls (stone to the wall plate), embrasures with leaded lancets, the doorway
   { const g = new THREE.CircleGeometry(R + T + 0.3, 48).rotateX(-Math.PI / 2).translate(0, Y, 0); put('gboards', g); }
-  const W1 = traceryWindow(2 * winI.hw, winI.ys, 'pointed', winI.k, 2, [1.0], { frame: 0.08, mull: 0.07, depth: 0.14 });
+  const W1 = traceryWindow(2 * winI.hw, winI.ys, 'pointed', winI.k, 1, [], { frame: 0.07, mull: 0.06, depth: 0.12 });
   for (let k = 0; k < 12; k++) {
     const sh = pathPts(new THREE.Shape(), [[-Lo / 2, -0.3], [Lo / 2, -0.3], [Lo / 2, GDM.wall + 0.05], [-Lo / 2, GDM.wall + 0.05]]);
     const hole = k === 0 ? doorO : k % 2 ? winO : null;
     if (hole) sh.holes.push(pathPts(new THREE.Path(), opn(hole), true));
     gdPut(k, 'gashlar', uvPlanar(new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 8 }).translate(0, 0, -T)));
     if (k % 2) {
-      gdPut(k, 'gashlar', loftGeo(opn(winO), 0, opn(winI), -0.75, ([x, y]) => [-x, -(y - 1.8), 0]));
+      gdPut(k, 'gashlar', loftGeo(opn(winO), 0, opn(winI), -0.75, ([x, y]) => [-x, -(y - 2.1), 0]));
       gdPut(k, 'gashlar', W1.stone.clone().translate(0, winI.dy, -0.82)); gdPut(k, 'dglass', W1.glass.clone().translate(0, winI.dy, -0.82));
     }
     // the wall plate: a moulded oak beam round the top of the stone (c15), and the boarded knee wall above it
@@ -194,28 +200,31 @@ function buildGryffDorm(sc, points) {
     beam([0, ty + 0.6, 0], [0, Y + GDM.apex - 0.1, 0], 0.3, 'oak');
     for (const [x, z] of [[1.8, 0], [-1.8, 0], [0, 1.8], [0, -1.8]]) beam([x, ty + (x ? 0.2 : 0.62), z], [0, ty + 2.0, 0], 0.18, 'oak');
   }
-  // ---- the stove (c14, c15): slab, cast-iron drum, slotted collar with the fire behind, domed lid, wire guard; the pipe
+  // ---- the stove (c14-c16): a square stone slab; a small cast-iron stove on four feet, its tall body with a cast door,
+  // a flange, a collar of upright slots with the fire behind, a wide domed lid pierced in rings and a knob; a round guard
+  // of coarse square mesh up to the collar; the pipe out of the back of the collar, an elbow, and straight up to the roof
   {
-    const c = [0, Y, 0];
-    put('gashlar', uvPlanar(new RoundedBoxGeometry(1.45, 0.07, 1.45, 1, 0.02).translate(c[0], Y + 0.035, c[2])));
-    const drum = [[0, 0.07], [0.4, 0.07], [0.41, 0.1], [0.37, 0.14], [0.34, 0.16]]; for (let i = 0; i <= 10; i++) drum.push([0.34 + (i % 2 ? 0.012 : 0), 0.18 + i * 0.05]);   // ribbed
-    drum.push([0.38, 0.7], [0.38, 0.73], [0.35, 0.74]);
-    put('castIron', lathe(drum, 40).translate(c[0], Y, c[2]));
-    put('castIron', lathe([[0.35, 0.96], [0.41, 0.97], [0.41, 1.0], [0.36, 1.02], [0.28, 1.06], [0.16, 1.09], [0.05, 1.1], [0.05, 1.14], [0.025, 1.16], [0, 1.16]], 40).translate(c[0], Y, c[2]));
-    const col = new THREE.CylinderGeometry(0.35, 0.35, 0.22, 56, 1, true), cu = col.attributes.uv; for (let i = 0; i < cu.count; i++) cu.setXY(i, cu.getX(i) * Math.PI * 2 * 0.35, cu.getY(i) * 0.16 - 0.03);
-    put('grille', col.translate(c[0], Y + 0.85, c[2]));
-    put('stoveGlow', new THREE.CylinderGeometry(0.32, 0.32, 0.21, 24).translate(c[0], Y + 0.85, c[2]));
-    const gd = new THREE.CylinderGeometry(0.64, 0.64, 1.0, 56, 1, true), gu = gd.attributes.uv; for (let i = 0; i < gu.count; i++) gu.setXY(i, gu.getX(i) * Math.PI * 2 * 0.64, gu.getY(i) * 1.0);
-    addMesh(gd.translate(c[0], Y + 0.07 + 0.5, c[2]), M.ironMesh, { cast: false, recv: false });
-    for (const y of [0.09, 1.07]) put('castIron', new THREE.TorusGeometry(0.64, y > 1 ? 0.022 : 0.014, 8, 56).rotateX(Math.PI / 2).translate(c[0], Y + y, c[2]));
-    for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; put('castIron', new THREE.CylinderGeometry(0.01, 0.01, 1.0, 6).translate(c[0] + Math.cos(a) * 0.64, Y + 0.57, c[2] + Math.sin(a) * 0.64)); }
-    const pipe = [[-0.22, 0.93, -0.22], [-0.36, 0.97, -0.36], [-0.44, 1.12, -0.44], [-0.44, 1.55, -0.44], [-0.44, GDM.apex - 0.4, -0.44]].map(([x, y, z]) => new THREE.Vector3(c[0] + x, Y + y, c[2] + z));
-    put('castIron', new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pipe, false, 'centripetal'), 64, 0.075, 16));
-    for (let y = 1.6; y < GDM.apex - 0.6; y += 1.1) put('castIron', new THREE.CylinderGeometry(0.085, 0.085, 0.06, 16).translate(c[0] - 0.44, Y + y, c[2] - 0.44));
-    // a towel and a scarf hung over the guard (c14)
-    const tm = xf([0.56, Y + 1.03, 0.28], Math.atan2(0.56, 0.28) + Math.PI / 2);
-    put('linen', merge([new RoundedBoxGeometry(0.34, 0.03, 0.12, 1, 0.01).translate(0, 0.05, 0.05), new RoundedBoxGeometry(0.34, 0.42, 0.02, 1, 0.008).translate(0, -0.15, 0.12), new RoundedBoxGeometry(0.34, 0.26, 0.02, 1, 0.008).translate(0, -0.08, -0.02)]).applyMatrix4(tm));
-    LAMPS.push({ room: GCR_ROOM, p: [c[0], Y + 0.84, c[2]], c: [1.0, 0.35, 0.1].map((v) => v * 1.6), r: 2.2, see: 30 });
+    const c = [0, Y, 0], h0 = 0.08, pa = (3 * Math.PI) / 4 + (6.2 * Math.PI) / 6, p = [Math.sin(pa), -Math.cos(pa)];   // the pipe leaves toward Dean's bed (c15)
+    put('gslab', new RoundedBoxGeometry(1.2, h0, 1.2, 2, 0.025).translate(c[0], Y + h0 / 2, c[2]));
+    for (let i = 0; i < 4; i++) { const a = Math.PI / 4 + (i * Math.PI) / 2; put('stoveIron', new RoundedBoxGeometry(0.07, 0.11, 0.1, 1, 0.025).rotateY(-a).translate(c[0] + Math.cos(a) * 0.2, Y + h0 + 0.055, c[2] + Math.sin(a) * 0.2)); }
+    put('stoveIron', lathe([[0, 0.15], [0.21, 0.15], [0.235, 0.17], [0.24, 0.2], [0.25, 0.22], [0.25, 0.66], [0.265, 0.68], [0.28, 0.7], [0.28, 0.725], [0.255, 0.735], [0, 0.735]].map(([r, y]) => [r, y + h0]), 48).translate(c[0], Y, c[2]));
+    { const f = gdF(1), a = Math.atan2(f.d[0], f.d[1]);   // the cast door on the front, toward the room's door side
+      put('stoveIron', merge([new RoundedBoxGeometry(0.2, 0.28, 0.03, 2, 0.012), new THREE.SphereGeometry(0.018, 10, 8).translate(0.07, 0, 0.022)]).translate(0, 0, 0.245).applyMatrix4(xf([c[0], Y + h0 + 0.42, c[2]], a))); }
+    const col = new THREE.CylinderGeometry(0.255, 0.255, 0.15, 64, 1, true), cu = col.attributes.uv; for (let i = 0; i < cu.count; i++) cu.setXY(i, cu.getX(i) * Math.PI * 2 * 0.255, cu.getY(i) * 0.15);
+    put('grille', col.translate(c[0], Y + h0 + 0.81, c[2]));
+    put('stoveGlow', new THREE.CylinderGeometry(0.24, 0.24, 0.14, 24).translate(c[0], Y + h0 + 0.81, c[2]));
+    put('stoveIron', new THREE.TorusGeometry(0.258, 0.008, 6, 48).rotateX(Math.PI / 2).translate(c[0], Y + h0 + 0.886, c[2]));
+    put('stoveLid', lathe([[0.24, 0.888], [0.33, 0.892], [0.338, 0.905], [0.32, 0.925], [0.26, 0.95], [0.16, 0.968], [0.05, 0.975], [0, 0.975]].map(([r, y]) => [r, y + h0]), 64).translate(c[0], Y, c[2]));
+    put('stoveIron', lathe([[0, 0.975], [0.022, 0.975], [0.012, 1.0], [0.024, 1.02], [0.012, 1.045], [0, 1.045]].map(([r, y]) => [r, y + h0]), 16).translate(c[0], Y, c[2]));
+    const gr = 0.46, gh = 0.8, gd = new THREE.CylinderGeometry(gr, gr, gh, 72, 1, true), gu = gd.attributes.uv; for (let i = 0; i < gu.count; i++) gu.setXY(i, gu.getX(i) * Math.PI * 2 * gr, gu.getY(i) * gh);
+    addMesh(gd.translate(c[0], Y + h0 + gh / 2, c[2]), M.gcage, { cast: false, recv: false });
+    put('cageWire', new THREE.TorusGeometry(gr, 0.011, 8, 72).rotateX(Math.PI / 2).translate(c[0], Y + h0 + gh, c[2]));
+    put('cageWire', new THREE.TorusGeometry(gr, 0.007, 6, 72).rotateX(Math.PI / 2).translate(c[0], Y + h0 + 0.02, c[2]));
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + 0.3; put('cageWire', new THREE.CylinderGeometry(0.006, 0.006, gh, 6).translate(c[0] + Math.cos(a) * gr, Y + h0 + gh / 2, c[2] + Math.sin(a) * gr)); }
+    const top = GDM.apex - 0.4, pipe = [[0.1, 0.8], [0.3, 0.8], [0.39, 0.83], [0.43, 0.93], [0.43, 1.2], [0.43, top]].map(([r, y]) => new THREE.Vector3(c[0] + p[0] * r, Y + h0 + y, c[2] + p[1] * r));
+    put('stoveIron', new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pipe, false, 'centripetal', 0.2), 80, 0.06, 18));
+    for (let y = 1.4; y < top - 0.3; y += 1.0) put('stoveIron', new THREE.CylinderGeometry(0.068, 0.068, 0.05, 18).translate(c[0] + p[0] * 0.43, Y + h0 + y, c[2] + p[1] * 0.43));
+    LAMPS.push({ room: GCR_ROOM, p: [c[0], Y + h0 + 0.8, c[2]], c: [1.0, 0.35, 0.1].map((q) => q * 1.6), r: 2.2, see: 30 });
   }
   // ---- the beds and their corners
   const bedGeo = gdBedParts(), beds = [], curtains = [], stars = [], mats = [], pads = [], wools = [], patches = [], trunks = [], cups = [], hooks = [];
@@ -225,7 +234,7 @@ function buildGryffDorm(sc, points) {
     P.push(new THREE.BoxGeometry(0.46, 0.62, 0.22).translate(0, 1.75, 0.11), new THREE.ExtrudeGeometry(pathPts(new THREE.Shape(), [[-0.27, 0], [0.27, 0], [0, 0.16]]), { depth: 0.24, bevelEnabled: false }).translate(0, 2.06, -0.01));   // the cabinet and its pediment
     P.push(new THREE.BoxGeometry(0.5, 0.05, 0.25).translate(0, 2.06, 0.11), new THREE.BoxGeometry(0.5, 0.04, 0.24).translate(0, 1.43, 0.11));
     return merge(P); })();
-  for (const [k, ini, num] of GDM_BEDS) {
+  for (const [k, ini, num, side] of GDM_BEDS) {
     const m = gdM(k, 0, 0, 0.42);
     beds.push(m);
     // the curtains: red velvet tied back at the four posts, star curtains drawn half along the sides near the head
@@ -236,12 +245,14 @@ function buildGryffDorm(sc, points) {
     mats.push(m.clone().multiply(xf([0, 0.62, 1.07], 0, 1)));
     pads.push(m.clone().multiply(xf([0, 0.8, 0.38], 0, [1.55, 1.0, 1.0], -Math.PI / 2 + 0.45)));
     (ini === 'R.W' ? patches : wools).push(m.clone().multiply(xf([0, 0.75, 1.36], 0, 1)));
-    trunks.push(m.clone().multiply(xf([0, 0, 2.55], 0, 1)));
-    cups.push(gdM(k, 0.96, 0, 0.0));
-    hooks.push(gdM(k, -0.96, 0, 0.0));
+    trunks.push(m.clone().multiply(xf([0, 0, 2.31], 0, 1)));
+    cups.push(gdM(k, side * 0.96, 0, 0.0));
+    hooks.push(gdM(k + side, -side * 0.85, 0, 0.0));
+    put('fwood', uvPlanar(new THREE.BoxGeometry(0.52, 2.45, 0.05).translate(side * 0.96, 1.32, 0.03)).applyMatrix4(gdM(k)));   // the panelling behind the washstand
+    put('fwood', uvPlanar(new THREE.BoxGeometry(0.52, 1.0, 0.04).translate(-side * 0.85, 1.72, 0.02)).applyMatrix4(gdM(k + side)));   // and behind the robes
     // the bed's number on the tester frieze, the owner's initials on the trunk
-    addMesh(new THREE.PlaneGeometry(0.42, 0.16).applyMatrix4(m.clone().multiply(xf([0, 2.25, 2.2], 0, 1))), letterMat(num, '#d8c8a0', 52), { cast: false });
-    addMesh(new THREE.PlaneGeometry(0.3, 0.11).applyMatrix4(m.clone().multiply(xf([0, 0.24, 2.802], 0, 1))), letterMat(ini, '#e8dcc4', 70), { cast: false });
+    addMesh(new THREE.PlaneGeometry(0.42, 0.16).applyMatrix4(m.clone().multiply(xf([0, 2.25, 2.2], 0, 1))), letterMat(num, '#d8c8a0', 46), { cast: false });
+    addMesh(new THREE.PlaneGeometry(0.3, 0.11).applyMatrix4(m.clone().multiply(xf([-0.1, 0.31, 2.542], 0, 1))), letterMat(ini, ini === 'HP' ? '#d6b46a' : '#e6dcc6', 78, 'bold'), { cast: false });
   }
   addInst(bedGeo, M.fwood, beds);
   addInst(curtainGeo(0.34, 2.14, 3.5, 0.045, 0.6), M.curtain, curtains, null, { cast: true });
@@ -250,12 +261,15 @@ function buildGryffDorm(sc, points) {
   addInst(gcrSculpt('pillow'), M.linen, pads);
   const blanket = uvPlanar(merge([new RoundedBoxGeometry(1.16, 0.06, 1.42, 2, 0.025).translate(0, 0.03, 0), ...[-1, 1].map((s) => new RoundedBoxGeometry(0.03, 0.3, 1.42, 1, 0.012).translate(s * 0.565, -0.12, 0)), new RoundedBoxGeometry(1.14, 0.03, 0.22, 1, 0.012).translate(0, 0.065, -0.62)]));
   addInst(blanket, M.wool, wools); addInst(blanket, M.patch, patches);
-  // trunks (c12): leather body, a lid line, brass corners, two straps, a side handle
-  addInst(new RoundedBoxGeometry(0.88, 0.44, 0.48, 2, 0.03).translate(0, 0.22, 0), M.trunk, trunks);
-  const tb = []; for (const sx of [-1, 1]) for (const sy of [0.02, 0.42]) for (const sz of [-1, 1]) tb.push(new THREE.BoxGeometry(0.07, 0.05, 0.07).translate(sx * 0.42, sy, sz * 0.22));
-  tb.push(new THREE.BoxGeometry(0.9, 0.012, 0.5).translate(0, 0.34, 0));
+  // trunks (c12, c15): a tan leather case with rounded edges, a lid seam, brass corner caps and studs, a leather handle on
+  // the front, the initials painted large over it
+  addInst(new RoundedBoxGeometry(0.8, 0.4, 0.46, 3, 0.045).translate(0, 0.2, 0), M.trunk, trunks);
+  const tb = []; for (const sx of [-1, 1]) for (const sy of [0.035, 0.365]) for (const sz of [-1, 1]) tb.push(new RoundedBoxGeometry(0.075, 0.075, 0.075, 1, 0.02).translate(sx * 0.37, sy, sz * 0.195));
+  for (let i = 0; i < 9; i++) tb.push(new THREE.SphereGeometry(0.006, 6, 4).translate(-0.3 + i * 0.075, 0.27, 0.232));
+  for (const x of [-0.09, 0.09]) tb.push(new THREE.BoxGeometry(0.035, 0.05, 0.01).translate(x, 0.16, 0.232));
+  tb.push(new THREE.BoxGeometry(0.05, 0.06, 0.01).translate(0, 0.28, 0.233));   // the lock
   addInst(merge(tb), M.brass, trunks, null, { cast: false });
-  addInst(merge([-0.24, 0.24].map((x) => new THREE.BoxGeometry(0.05, 0.46, 0.5).translate(x, 0.225, 0))), M.strap, trunks, null, { cast: false });
+  addInst(merge([new THREE.BoxGeometry(0.81, 0.012, 0.47).translate(0, 0.28, 0), new THREE.TorusGeometry(0.075, 0.012, 6, 16, Math.PI).rotateZ(Math.PI).translate(0, 0.165, 0.245)]), M.strap, trunks, null, { cast: false });
   // cupboards with a washbowl and jug, the pedimented mirror cabinet over them; hook rails with robes and scarves
   addInst(cupGeo, M.fwood, cups);
   addInst(new THREE.PlaneGeometry(0.33, 0.46), M.mirror, cups.map((m) => m.clone().multiply(xf([0, 1.75, 0.225], 0, 1))), null, { cast: false });
@@ -279,8 +293,8 @@ function buildGryffDorm(sc, points) {
   }
   addInst(GD_LAMP.brass, M.brass, lamps); addInst(GD_LAMP.chimney, M.globe, lamps, null, { cast: false }); addInst(GD_LAMP.shade, M.tole, lamps, null, { cast: false });
   for (const m of lamps) { v.set(0, 0.2, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.62, 0.3].map((q) => q * 2.4), r: 3.4, halo: 0.1, hk: 0.45, see: 30 }); }
-  addInst(gcrChair(), M.fwood, [gdM(2, -0.98, 0, 1.15, 0.3), gdM(8, 0.95, 0, 1.2, -0.2)]);
-  put('wicker', (() => { const g = lathe([[0, 0], [0.13, 0], [0.16, 0.32], [0.155, 0.33], [0.125, 0.01]], 24); const u = g.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i), u.getY(i) * 0.33); return g; })().applyMatrix4(gdM(4, 0.95, 0, 0.75)));
+  addInst(gcrChair(), M.fwood, [gdM(7, 0.05, 0, 0.3, 0.1), gdM(3, -0.1, 0, 0.32, -0.15)]);
+  put('wicker', (() => { const g = lathe([[0, 0], [0.13, 0], [0.16, 0.32], [0.155, 0.33], [0.125, 0.01]], 24); const u = g.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i), u.getY(i) * 0.33); return g; })().applyMatrix4(gdM(7, -0.55, 0, 0.3)));
   // the dormitory's light: two fills (no shadow, short), the moon or sun through the lancets comes from the set's sun
   for (const [x, z] of [[1.3, 0.9], [-1.3, -0.9]]) { const p = new THREE.PointLight(new THREE.Color(1.0, 0.66, 0.38), 0, 6, 1.6); p.position.set(x, Y + 2.6, z); p.userData = { d: 0.6, n: 1.3 }; sc.add(p); points.push(p); }
   gdDress();   // the boys' things (65c-gryffdress.js)
