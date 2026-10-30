@@ -63,6 +63,43 @@ M.gstone = procMat({ name: 'gstone', rgb: [1, 1, 1], rough: 0.9, bump: 1, uv: tr
   diffuseColor.rgb *= c;
   cgH = (1.0 - joint) * 0.005 + cgFbm3(P * 6.0) * 0.004; cgAO = mix(1.0, 0.72, joint);
 ` });
+// the dormitory stair's turret behind facet 3: its radius, its centre and the way its two doorways face from the newel
+const GT = (() => { const rr = 1.45, f = gcrF(3); return { rr, c: gcrP(3, 0, 0, -(GCR.T + rr)), ent0: Math.atan2(-f.d[1], -f.d[0]) }; })();
+// coursed ashlar for the stair turret, the passage and the dormitory (c10, c13, c15): courses of 0.34 m, blocks of
+// 0.35-1.0 m, fine recessed joints, dressed but pitted faces darker at their rounded arrises; dark brown in the turret,
+// paler sandstone in the dormitory. uv in metres (plan coordinates on level faces)
+M.gashlar = procMat({ name: 'gashlar', rgb: [1, 1, 1], rough: 0.9, bump: 1, uv: true, frag: /* glsl */ `
+  vec2 uv = abs(N.y) > 0.75 ? P.xz : UV;
+  float ch = 0.34, row = floor(uv.y / ch), fy = uv.y - row * ch, bl = 0.68;
+  float u = uv.x + cgH21(vec2(row, 1.7)) * bl, k = floor(u / bl);
+  float bm = (k - 1.0 + (cgH21(vec2(k - 1.0, row)) - 0.5) * 0.5) * bl, b0 = (k + (cgH21(vec2(k, row)) - 0.5) * 0.5) * bl;
+  float b1 = (k + 1.0 + (cgH21(vec2(k + 1.0, row)) - 0.5) * 0.5) * bl, b2 = (k + 2.0 + (cgH21(vec2(k + 2.0, row)) - 0.5) * 0.5) * bl;
+  float id = k, fx0 = u - b0, fx1 = b1 - u;
+  if (u < b0) { id = k - 1.0; fx0 = u - bm; fx1 = b0 - u; } else if (u > b1) { id = k + 1.0; fx0 = u - b1; fx1 = b2 - u; }
+  float rag = (cgVn(vec3(uv * 9.0, 4.0)) - 0.5) * 0.014, e = min(min(fx0, fx1), min(fy, ch - fy)) + rag;
+  float px = length(fwidth(uv)), joint = 1.0 - smoothstep(0.006, 0.006 + max(0.004, px), e), arris = 1.0 - smoothstep(0.0, 0.025, e);
+  joint = mix(joint, 0.1, smoothstep(0.03, 0.12, px));
+  float bid = cgH21(vec2(id, row) + 0.37), bid2 = cgH21(vec2(id, row) + 9.1);
+  float dorm = (1.0 - smoothstep(6.2, 6.8, length(P.xz))) * step(${(GCR.H + 1.0).toFixed(2)}, P.y);
+  vec3 c = mix(vec3(0.16, 0.13, 0.1), vec3(0.25, 0.215, 0.165), dorm) * mix(vec3(1.0), vec3(0.84, 0.9, 1.0), bid2 * 0.8) * (0.72 + 0.45 * bid);
+  float pit = cgFbm3(P * 22.0), sp = cgVn(P * 90.0);
+  c *= (0.85 + 0.25 * cgFbm3(P * 2.3 + bid * 5.0)) * (0.68 + 0.5 * pit) * (0.85 + 0.25 * sp) * (1.0 - 0.15 * arris);
+  c *= 1.0 - 0.22 * smoothstep(0.55, 0.85, cgFbm3(P * vec3(0.6, 0.25, 0.6) + 2.0));   // grime run down the wall
+  c = mix(c, vec3(0.07, 0.062, 0.052) * (0.8 + 0.3 * cgVn(P * 30.0)), joint);
+  diffuseColor.rgb *= c;
+  cgH = (1.0 - joint) * 0.003 + pit * 0.0012 + sp * 0.0004; cgAO = mix(1.0, 0.55, joint); cgRough = 0.8 + 0.15 * pit;
+` });
+// the stair's treads and newel: dark sandstone (c10), worn paler and smooth along the walking line a little out from the
+// newel, dust against the turret wall
+M.tread = procMat({ name: 'tread', rgb: [1, 1, 1], rough: 0.8, bump: 1, frag: /* glsl */ `
+  float r = length(P.xz - vec2(${GT.c[0].toFixed(3)}, ${GT.c[2].toFixed(3)})), up = step(0.7, N.y);
+  float wear = exp(-pow((r - 0.85) / 0.3, 2.0)) * up * step(r, 1.6), n = cgFbm3(P * 5.0), g = cgVn(P * 60.0);
+  vec3 c = vec3(0.17, 0.145, 0.118) * (0.8 + 0.35 * n) * (0.9 + 0.2 * cgVn(P * 1.3));
+  c = mix(c, c * 1.3 + 0.01, wear * 0.7);
+  c *= 1.0 - 0.3 * smoothstep(1.25, 1.45, r) * up * step(r, 1.6);
+  c *= 1.0 - 0.25 * step(N.y, -0.5);
+  diffuseColor.rgb *= c; cgRough = mix(0.85, 0.42, wear); cgH = n * 0.004 + g * 0.0008 - wear * 0.004;
+` });
 // woven wool: the painted design (uv 0..1 over GCR_TAP metres), warp ribs and weft hatching, faded dye
 const GCR_TAP = [5.6, 4.7];
 function tapestryMat(tex) {
@@ -848,48 +885,62 @@ function buildGryffindorCommon(sc) {
     LAMPS.push({ room: GCR_ROOM, p: gcrP(k, 0.85, 1.3, 2.6), c: [1.0, 0.45, 0.16].map((v) => v * 10), r: 9, see: 60 });
   }
 
-  // ---- the dormitory stair (facet 3, c10, HBP): a round-headed doorway, a stone newel stair winding up the turret four
-  // times round, past leaded windows and lamps, to a landing and a short passage into the dormitory (65b-gryffdorm.js)
+  // ---- the dormitory stair (facet 3, c10, HBP; the books): a round-headed doorway and a worn step, a stone newel stair
+  // winding up the turret four times round past leaded windows, lamps and the doors of the other years' dormitories, each
+  // with its sign (OotP), to a landing and a short passage into the sixth years' dormitory at the top (65b-gryffdorm.js)
   {
-    const k = 3, rr = 1.45, c = gcrP(k, 0, 0, -(T + rr)), f = gcrF(k), top = GDM.Y, N = 56, rise = top / N;
-    const ent0 = Math.atan2(-f.d[1], -f.d[0]);              // both doorways face this way from the newel (the room, the dormitory)
+    const k = 3, { rr, c, ent0 } = GT, top = GDM.Y, N = 56, rise = top / N;
     const da = (2 * Math.PI * 4 - 1.65) / (N - 1);          // so the last tread ends beside the top landing
+    const mid = (i) => ent0 + 0.45 + (i + 0.5) * da;        // the middle of tread i (its top at rise * (i + 1))
     archSurround(k, door, 0.3, 0.1);
+    lbox(k, -0.8, 0.8, 0, 0.09, -T - 0.05, -0.12, 'tread', 0.015);   // the worn step through the doorway (c10)
     // the turret wall, open where the two doorways are (three's cylinder angle runs from +z: theta = pi/2 - our angle)
-    insideCyl(c[0], c[2], -0.1, 3.0, rr, 'gstone', 40, Math.PI / 2 - ent0 + 0.58, 2 * Math.PI - 1.16);
-    insideCyl(c[0], c[2], 3.0, top, rr, 'gstone', 40);
-    insideCyl(c[0], c[2], top, top + 3.2, rr, 'gstone', 40, Math.PI / 2 - ent0 + 0.5, 2 * Math.PI - 1.0);
-    put('gstone', new THREE.CircleGeometry(rr + 0.1, 32).rotateX(Math.PI / 2).translate(c[0], top + 3.1, c[2]));
+    insideCyl(c[0], c[2], -0.1, 3.0, rr, 'gashlar', 48, Math.PI / 2 - ent0 + 0.58, 2 * Math.PI - 1.16);
+    insideCyl(c[0], c[2], 3.0, top, rr, 'gashlar', 48);
+    insideCyl(c[0], c[2], top, top + 3.2, rr, 'gashlar', 48, Math.PI / 2 - ent0 + 0.5, 2 * Math.PI - 1.0);
+    put('gashlar', new THREE.CircleGeometry(rr + 0.1, 32).rotateX(Math.PI / 2).translate(c[0], top + 3.1, c[2]));
     put('gflag', new THREE.CircleGeometry(rr + 0.1, 32).rotateX(-Math.PI / 2).translate(c[0], 0.002, c[2]));
-    put('gstone', new THREE.CylinderGeometry(0.17, 0.17, top + 3.1, 16).translate(c[0], (top + 3.1) / 2, c[2]));
-    const sector = (a0, a1, y, th) => {
-      const sh = new THREE.Shape(); sh.moveTo(Math.cos(a0) * 0.15, Math.sin(a0) * 0.15);
+    put('tread', new THREE.CylinderGeometry(0.27, 0.27, top + 3.1, 28).translate(c[0], (top + 3.1) / 2, c[2]));   // the newel: the treads' round ends
+    // a tread: a sector from the newel into the wall, its edges eased (the nosing), y its top, th its depth at the riser;
+    // with rake, its underside rises a tread's height across it so the soffit under the stair winds up smoothly
+    const sector = (a0, a1, y, th, rake = 0) => {
+      const sh = new THREE.Shape(); sh.moveTo(Math.cos(a0) * 0.25, Math.sin(a0) * 0.25);
       for (let j = 0; j <= 10; j++) { const a = a0 + (a1 - a0) * (j / 10); sh.lineTo(Math.cos(a) * (rr + 0.02), Math.sin(a) * (rr + 0.02)); }
-      sh.lineTo(Math.cos(a1) * 0.15, Math.sin(a1) * 0.15);
-      put('stairstone', uvPlanar(new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: false }).rotateX(Math.PI / 2).translate(c[0], y, c[2])));
+      sh.lineTo(Math.cos(a1) * 0.25, Math.sin(a1) * 0.25);
+      const g = new THREE.ExtrudeGeometry(sh, { depth: th - 0.04, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 }).rotateX(Math.PI / 2).translate(c[0], y - 0.02, c[2]);
+      if (rake) {
+        const p = g.attributes.position;
+        for (let j = 0; j < p.count; j++) {
+          if (p.getY(j) > y - 0.1) continue;
+          let a = Math.atan2(p.getZ(j) - c[2], p.getX(j) - c[0]); while (a < a0 - Math.PI) a += 2 * Math.PI; while (a > a0 + Math.PI) a -= 2 * Math.PI;
+          p.setY(j, p.getY(j) + clamp((a - a0) / da, 0, 1.1) * rake);
+        }
+        g.computeVertexNormals();
+      }
+      put('tread', g);
     };
-    for (let i = 0; i < N - 1; i++) { const a0 = ent0 + 0.45 + i * da; sector(a0, a0 + da + 0.05, rise * (i + 1), 0.3); }
-    sector(ent0 - 0.85, ent0 + 0.85, top, 0.32);   // the top landing
-    // where a tread is under an angle a: its top height on the turn below y
-    const treadAt = (a, below) => { let best = 0; for (let i = 0; i < N - 1; i++) { const a0 = ent0 + 0.45 + i * da, t = (((a - a0) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); const y = rise * (i + 1); if (t < da + 0.05 && y < below && y > best) best = y; } return best; };
-    // windows (one a turn, round the far side) and lamps on brackets, each a man's height over the tread under it
+    for (let i = 0; i < N - 1; i++) { const a0 = ent0 + 0.45 + i * da; sector(a0, a0 + da + 0.03, rise * (i + 1), 0.36, rise); }
+    sector(ent0 - 0.85, ent0 + 0.85, top, 0.34);   // the top landing
+    // the other years' dormitory doors, one each half turn on alternate sides (the sixth years' at the top is ours)
+    [[9, 'First Years'], [17, 'Second Years'], [24, 'Third Years'], [31, 'Fourth Years'], [39, 'Fifth Years'], [46, 'Seventh Years']].forEach(([i, sign]) => gtYearDoor(mid(i), rise * (i + 1), sign));
+    // windows (one a turn, round the far side) and lamps on brackets, each a man's height over its tread
     const Wt = traceryWindow(0.8, 1.0, 'tudor', 0.25, 2, [], { frame: 0.08, mull: 0.07, depth: 0.12 });
-    for (const [a, y0] of [[ent0 + Math.PI - 0.75, 0], [ent0 + Math.PI + 0.4, 3.0], [ent0 + Math.PI - 0.5, 5.8], [ent0 + Math.PI + 0.7, 8.5]]) {
-      const y = treadAt(a, y0 + 3.0) + 1.25, wx = c[0] + Math.cos(a) * (rr - 0.1), wz = c[2] + Math.sin(a) * (rr - 0.1), m = xf([wx, y, wz], Math.atan2(-Math.cos(a), -Math.sin(a)));
-      put('stairstone', Wt.stone.clone().applyMatrix4(m)); put('gglass', Wt.glass.clone().translate(0, 0, 0.06).applyMatrix4(m));
+    for (const i of [5, 21, 36, 50]) {
+      const a = mid(i), y = rise * (i + 1) + (i === 5 ? 0.95 : 1.25), m = xf([c[0] + Math.cos(a) * (rr - 0.1), y, c[2] + Math.sin(a) * (rr - 0.1)], Math.atan2(-Math.cos(a), -Math.sin(a)));
+      put('tread', Wt.stone.clone().applyMatrix4(m)); put('dglass', Wt.glass.clone().translate(0, 0, 0.06).applyMatrix4(m));
     }
     const sl = [], sb = [], v = new THREE.Vector3();
-    for (const [a, y0] of [[ent0 + 1.6, 1.0], [ent0 + 3.0, 2.4], [ent0 - 1.4, 4.0], [ent0 + 0.9, 5.4], [ent0 + 2.2, 6.8], [ent0 - 2.6, 8.0], [ent0 - 1.9, 9.0]]) {
-      const y = treadAt(a, y0 + 2.8) + 1.95, m = xf([c[0] + Math.cos(a) * (rr - 0.03), y, c[2] + Math.sin(a) * (rr - 0.03)], Math.atan2(-Math.cos(a), -Math.sin(a)));
+    for (const i of [4, 11, 19, 26, 33, 41, 48, 53]) {
+      const a = mid(i), m = xf([c[0] + Math.cos(a) * (rr - 0.03), rise * (i + 1) + 1.95, c[2] + Math.sin(a) * (rr - 0.03)], Math.atan2(-Math.cos(a), -Math.sin(a)));
       sb.push(m); sl.push(m.clone().multiply(xf([0, -0.02, 0.24], 0, 0.75)));
     }
     addInst(merge([new THREE.BoxGeometry(0.08, 0.13, 0.025), new THREE.CylinderGeometry(0.01, 0.01, 0.24, 8).rotateX(Math.PI / 2).translate(0, -0.03, 0.12)]), M.brass, sb);
     addInst(GCR_LAMP.brass, M.brass, sl); addInst(GCR_LAMP.globe, M.globe, sl, null, { cast: false });
-    for (const m of sl) { v.set(0, GCR_LAMP.top, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.6, 0.28].map((q) => q * 2.8), r: 4.0, halo: 0.16, hk: 0.45, see: 25 }); }
+    for (const m of sl) { v.set(0, GCR_LAMP.top, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.6, 0.28].map((q) => q * 2.6), r: 3.8, halo: 0.16, hk: 0.45, see: 25 }); }
     // the passage from the landing through the dormitory's wall to its door (the dormitory's facet 0 faces this way)
-    lbox(k, -0.78, 0.78, top - 0.35, top, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'stairstone', 0.0);
-    for (const s of [-1, 1]) lbox(k, s < 0 ? -1.1 : 0.72, s < 0 ? -0.72 : 1.1, top, top + 2.85, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'gstone', 0.0);
-    lbox(k, -1.1, 1.1, top + 2.78, top + 3.1, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'gstone', 0.0);
+    lbox(k, -0.78, 0.78, top - 0.35, top, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'tread', 0.0);
+    for (const s of [-1, 1]) lbox(k, s < 0 ? -1.1 : 0.72, s < 0 ? -0.72 : 1.1, top, top + 2.85, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'gashlar', 0.0);
+    lbox(k, -1.1, 1.1, top + 2.78, top + 3.1, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'gashlar', 0.0);
   }
 
   // ---- the portrait hole (facet 5): three steps up, a short passage, the back of the Fat Lady's portrait

@@ -42,7 +42,7 @@ Produced by **dasungta** · built by **Opus 5.5** (Claude Code)
 - **Online**: <https://dasungta.github.io/hogwarts-replica/> (GitHub Pages; the scene takes about half a minute to build, best in Chrome on a computer)
 - **Locally**: download [`dist/index.html`](dist/index.html) and open it in Chrome (it loads three.js and the fonts from the web).
 
-Drag to orbit and scroll to zoom. In the toolbar at the bottom left, the shot menu (镜头) has 47 viewpoints, including the Great Hall, the
+Drag to orbit and scroll to zoom. In the toolbar at the bottom left, the shot menu (镜头) has 50 viewpoints, including the Great Hall, the
 Grand Staircase and the Gryffindor common room inside. The map button (地图) opens the plan: click any building to fly there. The night button (夜晚)
 switches to night with lit windows. The tour button (播放运镜) plays a camera tour from the train's arrival and the boats
 across the lake to the Great Hall, then a flight over the grounds the next morning. When the view stops moving, the picture
@@ -58,8 +58,9 @@ keeps accumulating samples and gets cleaner the longer you wait. The interface i
 - **Three interiors**: the Great Hall (stone beasts holding fire bowls, the golden owl lectern, house banners, floating
   candles, the enchanted ceiling), the Entrance Hall with the moving Grand Staircase (gilt-framed portraits, suits of armour)
   and Gryffindor Tower: the common room (red millefleur tapestries, the great hooded fireplace with the house crest, velvet
-  armchairs, Persian rugs, the brass chandelier, a game of wizard chess) and, up the spiral stair, the boys' dormitory
-  (four-poster beds with red curtains, trunks with initials, the iron stove in its wire guard)
+  armchairs, Persian rugs, the brass chandelier, a game of wizard chess) and, up the spiral stair past the other years'
+  doors with their signs, the boys' dormitory (four-poster beds with red curtains, trunks with initials, the iron stove in
+  its wire guard, shaded lamps, and each boy's things from the books: an owl cage, a broom, a Chudley Cannons poster)
 - **Five films that play in the page**: the camera tour by default; add `?cut=snitch` (an FPV flight following the Golden
   Snitch), `?cut=dusk` (dusk), `?cut=magic` (a spell of light) or `?cut=gryff` (a first-person walk through Gryffindor
   Tower at night in one unbroken shot: round the common room, up the spiral stair and into the dormitory) to the address

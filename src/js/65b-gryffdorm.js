@@ -145,18 +145,18 @@ function gdBedParts() {
 // ---- the room (built into the common room's set; points: its lights list)
 function buildGryffDorm(sc, points) {
   const { R, T, Y } = GDM, L = GDM.L, Lo = 2 * (R + T) * Math.tan(Math.PI / 12), Rc = R / Math.cos(Math.PI / 12);
-  const doorO = { hw: 0.68, ys: 1.95, k: 0.56 }, winO = { hw: 0.55, ys: 1.85, k: 0.7, dy: 0.62 }, winI = { ...winO, hw: 0.3 };
+  const doorO = { hw: 0.68, ys: 1.95, k: 0.56 }, winO = { hw: 0.66, ys: 1.5, k: 0.62, dy: 0.5 }, winI = { ...winO, hw: 0.44 };   // windows: two lights over a seat
   // ---- the floor, the walls (stone to the wall plate), embrasures with leaded lancets, the doorway
   { const g = new THREE.CircleGeometry(R + T + 0.3, 48).rotateX(-Math.PI / 2).translate(0, Y, 0); put('gboards', g); }
-  const W1 = traceryWindow(2 * winI.hw, winI.ys, 'pointed', winI.k, 1, [1.15], { frame: 0.08, mull: 0.07, depth: 0.14 });
+  const W1 = traceryWindow(2 * winI.hw, winI.ys, 'pointed', winI.k, 2, [1.0], { frame: 0.08, mull: 0.07, depth: 0.14 });
   for (let k = 0; k < 12; k++) {
     const sh = pathPts(new THREE.Shape(), [[-Lo / 2, -0.3], [Lo / 2, -0.3], [Lo / 2, GDM.wall + 0.05], [-Lo / 2, GDM.wall + 0.05]]);
     const hole = k === 0 ? doorO : k % 2 ? winO : null;
     if (hole) sh.holes.push(pathPts(new THREE.Path(), opn(hole), true));
-    gdPut(k, 'gstone', uvPlanar(new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 8 }).translate(0, 0, -T)));
+    gdPut(k, 'gashlar', uvPlanar(new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 8 }).translate(0, 0, -T)));
     if (k % 2) {
-      gdPut(k, 'gstone', loftGeo(opn(winO), 0, opn(winI), -0.75, ([x, y]) => [-x, -(y - 1.8), 0]));
-      gdPut(k, 'gstone', W1.stone.clone().translate(0, winI.dy, -0.82)); gdPut(k, 'gglass', W1.glass.clone().translate(0, winI.dy, -0.82));
+      gdPut(k, 'gashlar', loftGeo(opn(winO), 0, opn(winI), -0.75, ([x, y]) => [-x, -(y - 1.8), 0]));
+      gdPut(k, 'gashlar', W1.stone.clone().translate(0, winI.dy, -0.82)); gdPut(k, 'dglass', W1.glass.clone().translate(0, winI.dy, -0.82));
     }
     // the wall plate: a moulded oak beam round the top of the stone (c15), and the boarded knee wall above it
     gdBox(k, -L / 2 - 0.1, L / 2 + 0.1, GDM.wall, GDM.wall + 0.32, -0.05, 0.3, 'oak', 0.03);
@@ -171,6 +171,9 @@ function buildGryffDorm(sc, points) {
     const m = gdM(0, -0.7, 0, 0.02).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2 + 0.12)).multiply(new THREE.Matrix4().makeTranslation(0.66, 0, 0));
     put('door', leaf.applyMatrix4(m));
     for (const y of [0.4, 1.7]) put('paintBlack', new THREE.BoxGeometry(1.0, 0.05, 0.012).translate(0.12, y, 0.075).applyMatrix4(m));
+    // the sign on its outer face, now turned to the room (the books: the dormitory door carries the year)
+    put('brass', new THREE.BoxGeometry(0.37, 0.1, 0.006).translate(0, 1.5, -0.003).applyMatrix4(m));
+    addMesh(new THREE.PlaneGeometry(0.34, 0.085).rotateY(Math.PI).translate(0, 1.5, -0.0065).applyMatrix4(m), plaqueMat('Sixth Years'), { cast: false });
   }
   // ---- the roof: boards on a twelve-sided cone over the knee wall, rafters at the corners and between, two purlin rings,
   // two rough tie beams crossing on the wall plate with a king post and braces (c11)
@@ -194,7 +197,7 @@ function buildGryffDorm(sc, points) {
   // ---- the stove (c14, c15): slab, cast-iron drum, slotted collar with the fire behind, domed lid, wire guard; the pipe
   {
     const c = [0, Y, 0];
-    put('gstone', uvPlanar(new RoundedBoxGeometry(1.45, 0.07, 1.45, 1, 0.02).translate(c[0], Y + 0.035, c[2])));
+    put('gashlar', uvPlanar(new RoundedBoxGeometry(1.45, 0.07, 1.45, 1, 0.02).translate(c[0], Y + 0.035, c[2])));
     const drum = [[0, 0.07], [0.4, 0.07], [0.41, 0.1], [0.37, 0.14], [0.34, 0.16]]; for (let i = 0; i <= 10; i++) drum.push([0.34 + (i % 2 ? 0.012 : 0), 0.18 + i * 0.05]);   // ribbed
     drum.push([0.38, 0.7], [0.38, 0.73], [0.35, 0.74]);
     put('castIron', lathe(drum, 40).translate(c[0], Y, c[2]));
@@ -266,20 +269,21 @@ function buildGryffDorm(sc, points) {
     s.computeVertexNormals();
     for (const m of hooks) for (const [dz, off] of [[0.04, 0], [0.07, 0.05]]) addSculpt(s.clone(), M.gscarf, m.clone().multiply(xf([0.12 + off * 0.3, 1.86 - 0.62, 0.1 + dz], 0, 1, 0, Math.PI / 2 + (off ? 0.06 : -0.04))), { cast: false });
   }
-  // a lamp on each bed's back panel; chairs at two beds, a wicker basket
+  // a shaded oil lamp on each bed's back panel (OotP, HBP); chairs at two beds, a wicker basket
   const lamps = [];
   for (const [k] of GDM_BEDS) {
     put('fwood', uvPlanar(new THREE.BoxGeometry(1.4, 2.45, 0.05).translate(0, 1.32, 0.03)).applyMatrix4(gdM(k)));   // the panelled back
     for (const x of [-0.45, 0, 0.45]) put('fwood', uvPlanar(new THREE.BoxGeometry(0.4, 0.7, 0.025).translate(x, 1.95, 0.065)).applyMatrix4(gdM(k)));
-    const m = gdM(k, 0.0, 1.62, 0.1); lamps.push(m.clone().multiply(xf([0, 0.0, 0.2], 0, 0.75)));
+    const m = gdM(k, 0.0, 1.62, 0.1); lamps.push(m.clone().multiply(xf([0, -0.03, 0.22], 0, 1)));
     put('brass', merge([new THREE.BoxGeometry(0.08, 0.13, 0.025), new THREE.CylinderGeometry(0.01, 0.01, 0.2, 8).rotateX(Math.PI / 2).translate(0, -0.03, 0.1)]).applyMatrix4(m));
   }
-  addInst(GCR_LAMP.brass, M.brass, lamps); addInst(GCR_LAMP.globe, M.globe, lamps, null, { cast: false });
-  for (const m of lamps) { v.set(0, GCR_LAMP.top, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.62, 0.3].map((q) => q * 2.4), r: 3.4, halo: 0.18, hk: 0.45, see: 30 }); }
+  addInst(GD_LAMP.brass, M.brass, lamps); addInst(GD_LAMP.chimney, M.globe, lamps, null, { cast: false }); addInst(GD_LAMP.shade, M.tole, lamps, null, { cast: false });
+  for (const m of lamps) { v.set(0, 0.2, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.62, 0.3].map((q) => q * 2.4), r: 3.4, halo: 0.1, hk: 0.45, see: 30 }); }
   addInst(gcrChair(), M.fwood, [gdM(2, -0.98, 0, 1.15, 0.3), gdM(8, 0.95, 0, 1.2, -0.2)]);
   put('wicker', (() => { const g = lathe([[0, 0], [0.13, 0], [0.16, 0.32], [0.155, 0.33], [0.125, 0.01]], 24); const u = g.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i), u.getY(i) * 0.33); return g; })().applyMatrix4(gdM(4, 0.95, 0, 0.75)));
   // the dormitory's light: two fills (no shadow, short), the moon or sun through the lancets comes from the set's sun
   for (const [x, z] of [[1.3, 0.9], [-1.3, -0.9]]) { const p = new THREE.PointLight(new THREE.Color(1.0, 0.66, 0.38), 0, 6, 1.6); p.position.set(x, Y + 2.6, z); p.userData = { d: 0.6, n: 1.3 }; sc.add(p); points.push(p); }
+  gdDress();   // the boys' things (65c-gryffdress.js)
   void BR;
 }
 // the stone ring round an opening in a dormitory wall (as archSurround, in the dormitory's frame)
@@ -288,6 +292,6 @@ function archSurroundD(k, p, o, d) {
   for (const P of [{ A: inner, zA: d, B: outer, zB: d, want: () => [0, 0, 1] }, { A: inner, zA: 0, B: inner, zB: d, want: ([x, y]) => [cx - x, cy - y, 0] }, { A: outer, zA: 0, B: outer, zB: d, want: ([x, y]) => [x - cx, y - cy, 0] }]) {
     const g = loftGeo(P.A, P.zA, P.B, P.zB, P.want), keep = (P.A.length - 1) * 6, h = new THREE.BufferGeometry();
     for (const [k2, n] of [['position', 3], ['uv', 2], ['normal', 3]]) h.setAttribute(k2, new THREE.Float32BufferAttribute(g.attributes[k2].array.slice(0, keep * n), n));
-    gdPut(k, 'gstone', h);
+    gdPut(k, 'gashlar', h);
   }
 }

@@ -59,16 +59,22 @@ const SHOTS = {
   gstairup: (() => {   // on the ninth tread of the turret stair: the steps winding up, the doorway down to the common room (65-gryffindor.js)
     const c = gcrP(3, 0, 0, -(GCR.T + 1.45)), f = gcrF(3), e = Math.atan2(-f.d[1], -f.d[0]), da = (2 * Math.PI * 4 - 1.65) / 55, rise = GDM.Y / 56;
     const a = e + 0.45 + 8.5 * da, b = a + 2.1, at = (q, r, y) => [c[0] + Math.cos(q) * r, y, c[2] + Math.sin(q) * r];
-    return { scene: 'gryff', pos: at(a, 0.7, rise * 9 + 1.55), target: at(b, 1.05, rise * 9 + 1.25), fov: 78 };
+    return { scene: 'gryff', pos: at(a, 1.1, rise * 9 + 1.55), target: at(b, 0.9, rise * 9 + 1.15), fov: 78, near: 0.08 };
   })(),
-  gstairtop: { scene: 'gryff', pos: gcrP(3, 0.1, GDM.Y + 1.62, -GCR.T - 1.05), target: gcrP(3, -0.1, GDM.Y + 1.35, 3.2), fov: 64 },
+  gstairdoor: (() => {   // on the turret stair, the third years' door a few steps up (65c-gryffdress.js)
+    const { c, ent0 } = GT, da = (2 * Math.PI * 4 - 1.65) / 55, rise = GDM.Y / 56, mid = (i) => ent0 + 0.45 + (i + 0.5) * da, at = (q, r, y) => [c[0] + Math.cos(q) * r, y, c[2] + Math.sin(q) * r];
+    return { scene: 'gryff', pos: at(mid(20.2), 0.55, rise * 21 + 1.55), target: at(mid(24.3), 1.35, rise * 25 + 1.0), fov: 72, near: 0.08 };
+  })(),
+  gdormron: { scene: 'gryff', pos: gdP(4, 0.35, 1.5, 3.4), target: gdP(4, -0.15, 1.15, 0.3), fov: 58 },
+  gdormwin: { scene: 'gryff', pos: gdP(2, 0.9, 1.25, 1.9), target: gdP(3, 0.05, 0.8, -0.2), fov: 55 },
+  gstairtop: { scene: 'gryff', pos: gcrP(3, 0.1, GDM.Y + 1.62, -GCR.T - 1.05), target: gcrP(3, -0.1, GDM.Y + 1.35, 3.2), fov: 64, near: 0.08 },
   lab: { scene: 'lab', pos: [0, 4.2, 9.5], target: [0, 4.4, 0], fov: 50 },
   labowl: { scene: 'lab', pos: [0.6, 1.6, 3.6], target: [0, 1.3, 1.5], fov: 40 },
 };
 const ROOM_NAME = { hall: '大礼堂', stair: '门厅与大楼梯', gryff: '格兰芬多塔（休息室与宿舍）' };
 let controls = null, shotName = Q.get('shot') || 'arrival';
 function applyCam(s) {
-  camera.fov = s.fov; camera.position.set(...s.pos); camera.lookAt(...s.target); camera.updateProjectionMatrix();
+  camera.fov = s.fov; camera.near = s.near || 0.5; camera.position.set(...s.pos); camera.lookAt(...s.target); camera.updateProjectionMatrix();   // near: closer for a viewpoint in a narrow stair
   if (controls) { controls.target.set(...s.target); controls.update(); }
 }
 const INT_BUILD = { hall: buildHallInterior, stair: buildStairInterior, gryff: buildGryffindorCommon };
@@ -91,7 +97,7 @@ function switchScene(key) {
 function applyShot(id) {
   let s = SHOTS[id] || SHOTS.arrival;
   if ((s.scene ?? null) !== ACTIVE) switchScene(s.scene ?? null);
-  if (Q.has('cam')) { const c = Q.get('cam').split(',').map(Number); s = { pos: c.slice(0, 3), target: c.slice(3, 6), fov: c[6] || 40 }; }
+  if (Q.has('cam')) { const c = Q.get('cam').split(',').map(Number); s = { pos: c.slice(0, 3), target: c.slice(3, 6), fov: c[6] || 40, near: s.near }; }
   shotName = id; applyCam(s);
   const sel = $('shotsel'); if (sel && SHOTS[id]) sel.value = id;
 }
