@@ -300,9 +300,9 @@ async function main() {
     console.log('[tris]', Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([k, v]) => k + ' ' + (v / 1e6).toFixed(2) + 'M').join(', '));
   }
   if (HEADLESS && Q.has('film')) {
-    await Promise.all(['九月一日夜霍格莫德车站坐船过黑湖门厅与大楼梯大礼堂开学晚宴第二天清晨霍格沃茨城堡与场地之后出品人@dasungta_zhang参考：拍摄模型照片（维基共享资源，Karen Roe 等摄，CC BY）· Harry Potter Wiki · 乐高 76419'].map((s) => document.fonts.load('500 40px "Noto Serif SC"', s).catch(() => {})));
+    await Promise.all(['九月一日夜霍格莫德车站坐船过黑湖门厅与大楼梯大礼堂开学晚宴第二天清晨霍格沃茨城堡与场地之后出品人@dasungta_zhang参考：拍摄模型照片（维基共享资源，Karen Roe 等摄，CC BY）· Harry Potter Wiki · 乐高 76419', '格兰芬多塔参考：利维斯登片场照片（维基共享资源，CC BY）·《哈利·波特与混血王子》'].map((s) => document.fonts.load('500 40px "Noto Serif SC"', s).catch(() => {})));
     await document.fonts.load('700 40px "Noto Serif SC"', SN_LABEL_TEXT).catch(() => {});   // the snitch film's place names
-    await document.fonts.load('60px "IM Fell English SC"', "Hogwarts TheBoathouseViaductTrainingGroundsAstronomyTowerSuspensionBridgeGrandStaircaseMovingGreatHallClockCourtyardWoodenOwleryStoneCircleWhompingWillowHagrid'sHutQuidditchPitch").catch(() => {});
+    await document.fonts.load('60px "IM Fell English SC"', "Hogwarts TheBoathouseViaductTrainingGroundsAstronomyTowerSuspensionBridgeGrandStaircaseMovingGreatHallClockCourtyardWoodenOwleryStoneCircleWhompingWillowHagrid'sHutQuidditchPitch GryffindorTower").catch(() => {});
     tourInit();
     window.__tourFrame = tourFrame;
     window.__ev = (src) => eval(src);   // tools/probe.mjs: run a snippet inside the module (to try camera keys)
@@ -375,11 +375,12 @@ async function main() {
   let tn = 0, lastQ = null;
   const startTour = async () => {
     const ld = $('loading'), lt = $('load-msg'), prev = lt.textContent;
-    if (!INT.hall || !INT.stair || !TOUR.shots) {
-      ld.hidden = false; lt.textContent = '正在准备运镜（搭建门厅和大礼堂）……';
+    const rooms = TOUR.cut === 'gryff' ? ['gryff'] : ['stair', 'hall'];   // the sets the cut plays in
+    if (rooms.some((k) => !INT[k]) || !TOUR.shots) {
+      ld.hidden = false; lt.textContent = TOUR.cut === 'gryff' ? '正在准备运镜（搭建格兰芬多塔）……' : '正在准备运镜（搭建门厅和大礼堂）……';
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       tourInit();
-      for (const k of ['stair', 'hall']) if (renderer.compileAsync) await renderer.compileAsync(INT[k].scene, camera).catch(() => {});
+      for (const k of rooms) if (renderer.compileAsync && INT[k]) await renderer.compileAsync(INT[k].scene, camera).catch(() => {});
       ld.hidden = true; lt.textContent = prev;
     }
     $('tourpos').max = TOUR.dur.toFixed(1);

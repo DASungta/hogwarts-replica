@@ -8074,11 +8074,12 @@ M.globe = procMat({ name: 'globe', rgb: [0.5, 0.45, 0.38], rough: 0.3, frag: /* 
   float h = 0.6 + 0.4 * cgVn(P * 30.0);
   cgEmit = vec3(1.0, 0.66, 0.32) * (0.22 + 2.4 * uLamp) * h;
 ` });
-// a fine iron mesh (the fire screen): wires 2 mm, 12 mm apart (uv in metres)
-M.ironMesh = procMat({ name: 'ironMesh', rgb: [0.03, 0.028, 0.025], rough: 0.5, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
+// a fine iron mesh (the fire screen, the stove's guard): wires 2 mm, 12 mm apart (uv in metres), see-through by its
+// coverage where the wires are finer than a pixel (stochastic discard sparkled in the film, moving)
+M.ironMesh = procMat({ name: 'ironMesh', rgb: [0.03, 0.028, 0.025], rough: 0.5, uv: true, side: THREE.DoubleSide, std: { transparent: true, depthWrite: false }, frag: /* glsl */ `
   vec2 g = abs(fract(UV / 0.012) - 0.5); float px = length(fwidth(UV / 0.012));
-  if (px < 0.3) { if (max(g.x, g.y) < 0.36 - px) discard; }
-  else if (cgH21(gl_FragCoord.xy + fract(P.xy * 37.0) * 91.0) > 0.48) discard;
+  float wire = smoothstep(0.36 - px - 0.02, 0.36 + px, max(g.x, g.y));
+  diffuseColor.a = mix(wire, 0.48, smoothstep(0.15, 0.45, px));
 ` });
 // pierced brass (the chandelier's band): a row of quatrefoils (uv in metres)
 M.pierced = procMat({ name: 'pierced', rgb: [0.72, 0.5, 0.2], metal: 1, rough: 0.32, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
@@ -8788,7 +8789,7 @@ function buildGryffindorCommon(sc) {
       const pan = (u0, u1, w0, w1) => {
         const dx = u1 - u0, dz = w1 - w0, Lp = Math.hypot(dx, dz), ry = Math.atan2(-dz, dx), y0 = 0.1, y1 = 0.92;
         const g = new THREE.PlaneGeometry(Lp, y1 - y0), uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * Lp, uv.getY(i) * (y1 - y0));
-        gcrPut(k, 'ironMesh', g.rotateY(ry).translate((u0 + u1) / 2, (y0 + y1) / 2, (w0 + w1) / 2));
+        addMesh(g.rotateY(ry).translate((u0 + u1) / 2, (y0 + y1) / 2, (w0 + w1) / 2).applyMatrix4(gcrM(k)), M.ironMesh, { cast: false, recv: false });   // no shadow: it would hide the fire
         for (const y of [y0, y1]) gcrPut(k, 'brass', new THREE.CylinderGeometry(0.012, 0.012, Lp, 8).rotateZ(Math.PI / 2).rotateY(ry).translate((u0 + u1) / 2, y, (w0 + w1) / 2));
         for (const [u, w] of [[u0, w0], [u1, w1]]) { gcrPut(k, 'brass', new THREE.CylinderGeometry(0.014, 0.014, 0.9, 8).translate(u, 0.51, w)); gcrPut(k, 'brass', new THREE.SphereGeometry(0.026, 8, 6).translate(u, 0.97, w)); }
       };
@@ -8831,13 +8832,13 @@ function buildGryffindorCommon(sc) {
       put('stairstone', Wt.stone.clone().applyMatrix4(m)); put('gglass', Wt.glass.clone().translate(0, 0, 0.06).applyMatrix4(m));
     }
     const sl = [], sb = [], v = new THREE.Vector3();
-    for (const [a, y0] of [[ent0 + 1.6, 1.0], [ent0 - 1.4, 4.0], [ent0 + 2.2, 6.8], [ent0 - 1.9, 9.0]]) {
+    for (const [a, y0] of [[ent0 + 1.6, 1.0], [ent0 + 3.0, 2.4], [ent0 - 1.4, 4.0], [ent0 + 0.9, 5.4], [ent0 + 2.2, 6.8], [ent0 - 2.6, 8.0], [ent0 - 1.9, 9.0]]) {
       const y = treadAt(a, y0 + 2.8) + 1.95, m = xf([c[0] + Math.cos(a) * (rr - 0.03), y, c[2] + Math.sin(a) * (rr - 0.03)], Math.atan2(-Math.cos(a), -Math.sin(a)));
       sb.push(m); sl.push(m.clone().multiply(xf([0, -0.02, 0.24], 0, 0.75)));
     }
     addInst(merge([new THREE.BoxGeometry(0.08, 0.13, 0.025), new THREE.CylinderGeometry(0.01, 0.01, 0.24, 8).rotateX(Math.PI / 2).translate(0, -0.03, 0.12)]), M.brass, sb);
     addInst(GCR_LAMP.brass, M.brass, sl); addInst(GCR_LAMP.globe, M.globe, sl, null, { cast: false });
-    for (const m of sl) { v.set(0, GCR_LAMP.top, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.6, 0.28].map((q) => q * 2.2), r: 3.6, halo: 0.16, hk: 0.45, see: 25 }); }
+    for (const m of sl) { v.set(0, GCR_LAMP.top, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.6, 0.28].map((q) => q * 2.8), r: 4.0, halo: 0.16, hk: 0.45, see: 25 }); }
     // the passage from the landing through the dormitory's wall to its door (the dormitory's facet 0 faces this way)
     lbox(k, -0.78, 0.78, top - 0.35, top, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'stairstone', 0.0);
     for (const s of [-1, 1]) lbox(k, s < 0 ? -1.1 : 0.72, s < 0 ? -0.72 : 1.1, top, top + 2.85, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'gstone', 0.0);
@@ -9187,7 +9188,7 @@ M.wool = procMat({ name: 'wool', rgb: [0.15, 0.022, 0.02], rough: 0.95, bump: 1,
 // a knitted patchwork blanket (Ron's, c13): squares of coloured wool (uv in metres)
 M.patch = procMat({ name: 'patch', rgb: [1, 1, 1], rough: 0.95, uv: true, bump: 1, frag: /* glsl */ `
   vec2 c = floor(UV / 0.14); float h = cgH21(c), h2 = cgH21(c + 5.3);
-  vec3 col = 0.5 + 0.5 * cos(6.2831 * (h + vec3(0.0, 0.33, 0.67))); col = mix(col, vec3(0.85, 0.8, 0.7), step(0.8, h2)) * 0.42;
+  vec3 col = 0.5 + 0.5 * cos(6.2831 * (h + vec3(0.0, 0.33, 0.67))); col = mix(mix(col, vec3(0.55, 0.45, 0.35), 0.45), vec3(0.75, 0.7, 0.6), step(0.8, h2)) * 0.32;   // faded knitted wool
   vec2 f = fract(UV / 0.14); float seam = smoothstep(0.0, 0.06, min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y)));
   float k = cgVn(vec3(UV * vec2(180.0, 90.0), h * 9.0));
   diffuseColor.rgb = col * (0.75 + 0.3 * k) * mix(0.6, 1.0, seam); cgH = k * 0.0008 + seam * 0.002;
@@ -9314,7 +9315,7 @@ function buildGryffDorm(sc, points) {
     put('grille', col.translate(c[0], Y + 0.85, c[2]));
     put('stoveGlow', new THREE.CylinderGeometry(0.32, 0.32, 0.21, 24).translate(c[0], Y + 0.85, c[2]));
     const gd = new THREE.CylinderGeometry(0.64, 0.64, 1.0, 56, 1, true), gu = gd.attributes.uv; for (let i = 0; i < gu.count; i++) gu.setXY(i, gu.getX(i) * Math.PI * 2 * 0.64, gu.getY(i) * 1.0);
-    put('ironMesh', gd.translate(c[0], Y + 0.07 + 0.5, c[2]));
+    addMesh(gd.translate(c[0], Y + 0.07 + 0.5, c[2]), M.ironMesh, { cast: false, recv: false });
     for (const y of [0.09, 1.07]) put('castIron', new THREE.TorusGeometry(0.64, y > 1 ? 0.022 : 0.014, 8, 56).rotateX(Math.PI / 2).translate(c[0], Y + y, c[2]));
     for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; put('castIron', new THREE.CylinderGeometry(0.01, 0.01, 1.0, 6).translate(c[0] + Math.cos(a) * 0.64, Y + 0.57, c[2] + Math.sin(a) * 0.64)); }
     const pipe = [[-0.22, 0.93, -0.22], [-0.36, 0.97, -0.36], [-0.44, 1.12, -0.44], [-0.44, 1.55, -0.44], [-0.44, GDM.apex - 0.4, -0.44]].map(([x, y, z]) => new THREE.Vector3(c[0] + x, Y + y, c[2] + z));
@@ -10925,7 +10926,7 @@ function shellMesh() { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 
 // boats, Hagrid's lantern, the turning stair, the enchanted ceiling). The page plays it in real time as a preview;
 // tools/film.mjs renders it frame by frame (several samples per frame spread over the shutter, so it has motion blur).
 const TOUR_FPS = 24;
-const TOUR = { shots: null, dur: 0, playing: false, t: 0, cur: -1, cut: Q.get('cut') || 'tour' };   // cut: the tour, 'magic' (89-short.js) or 'dusk' (89b-dusk.js)
+const TOUR = { shots: null, dur: 0, playing: false, t: 0, cur: -1, cut: Q.get('cut') || 'tour' };   // cut: the tour, 'magic' (89-short.js), 'dusk' (89b-dusk.js), 'snitch' (89c), 'gryff' (89d-gryffwalk.js)
 const TOURX = { fleet: null, fleetBody: null, fleetLamps: null, lantern: null, lampPos: [], boat: null };
 
 // ---- interpolation: keys [{ t, p, q, f }] → camera at time t; zero tangents at the ends ease the move in and out
@@ -11193,8 +11194,8 @@ function drawCaption(g, w, h, c) { // the same caption drawn into a video frame 
 }
 function tourInit() {
   buildTourProps();
-  ensureInterior('stair'); ensureInterior('hall');
-  if (!TOUR.shots) TOUR.shots = TOUR.cut === 'magic' ? shortShots() : TOUR.cut === 'dusk' ? duskShots() : TOUR.cut === 'snitch' ? snitchShots() : tourShots();
+  if (TOUR.cut !== 'gryff') { ensureInterior('stair'); ensureInterior('hall'); }
+  if (!TOUR.shots) TOUR.shots = TOUR.cut === 'magic' ? shortShots() : TOUR.cut === 'dusk' ? duskShots() : TOUR.cut === 'snitch' ? snitchShots() : TOUR.cut === 'gryff' ? gryffWalkShots() : tourShots();
 }
 function tourStop() {
   TOUR.playing = false; TOUR.cur = -1;
@@ -11208,6 +11209,7 @@ function tourStop() {
   if (TOUR.cut === 'magic') shortStop();
   if (TOUR.cut === 'dusk') duskStop();
   if (TOUR.cut === 'snitch') snitchStop();
+  if (TOUR.cut === 'gryff') gryffWalkStop();
   pipeline.lutBlend = 1;
 }
 // one frame of a named shot at its own time lt, levels measured afresh (tools/probe.mjs)
@@ -12334,6 +12336,135 @@ function snitchStop() {
   sunLight.target.position.set(10, 0, 20); Object.assign(sunLight.shadow.camera, { left: -300, right: 300, top: 300, bottom: -300 }); sunLight.shadow.camera.updateProjectionMatrix();
 }
 
+// ================================================================== 89d-gryffwalk.js
+// ------------------------------------------------------------------ Gryffindor Tower, walked through in one unbroken first-person shot (?cut=gryff)
+// In by the portrait hole and round the common room (the fire and the crest, the chess, the big painting and the dresser),
+// through the south-east doorway and up the turret stair four times round, along the passage into the boys' dormitory,
+// round the stove to Harry's bed; at night, by firelight and lamplight. No cuts and no change of set: the common room, the
+// stair and the dormitory are one set (65-gryffindor.js, 65b-gryffdorm.js). Storyboard: docs/格兰芬多塔.md.
+const GW = { eye: 1.62, fov: 66 };
+// a walk: points [x, y, z, speed (m/s), hold (s)] on a smooth curve, the speed changing evenly from point to point, a hold
+// standing still at a point; returns the position at time t and the times each point is reached (Ta) and left (Td)
+function gwRoute(pts) {
+  const n = pts.length, D = (n - 1) * 60;
+  const curve = new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(p[0], p[1], p[2])), false, 'centripetal');
+  curve.arcLengthDivisions = D;
+  const lens = curve.getLengths(D), L = lens[D], S = pts.map((_, i) => lens[i * 60]), Ta = [0], Td = [pts[0][4] || 0], seg = [];
+  for (let i = 0; i < n - 1; i++) {
+    const va = pts[i][3], vb = pts[i + 1][3], dt = (2 * (S[i + 1] - S[i])) / Math.max(va + vb, 0.15);
+    seg.push([Td[i], S[i], va, (vb - va) / dt, dt]);
+    Ta.push(Td[i] + dt); Td.push(Ta[i + 1] + (pts[i + 1][4] || 0));
+  }
+  const _v = new THREE.Vector3();
+  const sOf = (t) => {
+    if (t <= Td[0]) return 0;
+    for (let i = 0; i < seg.length; i++) {
+      const [t0, s0, v0, a, dt] = seg[i];
+      if (t < t0 + dt) return Math.min(L, s0 + v0 * (t - t0) + 0.5 * a * (t - t0) ** 2);
+      if (t < Td[i + 1]) return S[i + 1];
+    }
+    return L;
+  };
+  const at = (t) => { curve.getPointAt(clamp(sOf(t) / L, 0, 1), _v); return [_v.x, _v.y, _v.z]; };
+  return { at, Ta, Td, T1: Td[n - 1], L };
+}
+// where to look: keys { t, look: [x, y, z] } or { t, ahead: pitch } (along the way it is going), turned into yaw and pitch
+// at the key's own moment and interpolated as angles (C1, through the keys), so the view swings round the shortest way
+function gwLook(P, keys) {
+  const K2 = [];
+  for (const k of keys) {
+    const p = P.at(k.t);
+    let d;
+    if (k.look) d = vsub(k.look, p);
+    else { const a = P.at(k.t - 0.25), b = P.at(k.t + 0.25); d = vsub(b, a); d[1] = 0; if (vlen(d) < 1e-4) d = [0, 0, -1]; }
+    d = vnorm(d);
+    let yaw = Math.atan2(d[0], d[2]);
+    const pitch = k.look ? Math.asin(clamp(d[1], -1, 1)) : k.ahead;
+    if (K2.length) { const prev = K2[K2.length - 1].p[0]; while (yaw - prev > Math.PI) yaw -= 2 * Math.PI; while (yaw - prev < -Math.PI) yaw += 2 * Math.PI; }
+    K2.push({ t: k.t, p: [yaw, pitch] });
+  }
+  return (t) => { const [yaw, pitch] = trackAt(K2, t, 'p'); return [Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch)]; };
+}
+function gwPaths() {
+  const e = GW.eye, top = GDM.Y, rr = 1.45, c = gcrP(3, 0, 0, -(GCR.T + rr)), f = gcrF(3), ent0 = Math.atan2(-f.d[1], -f.d[0]);
+  const N = 56, rise = top / N, da = (2 * Math.PI * 4 - 1.65) / (N - 1);   // the turret stair (65-gryffindor.js)
+  const ramp = (a) => clamp(rise * ((a - ent0 - 0.45) / da + 0.5), 0, top);   // the line through the middle of the treads
+  const S = (a, r, v) => [c[0] + Math.cos(a) * r, ramp(a) + e, c[2] + Math.sin(a) * r, v];
+  const P = [];
+  const W = {};   // named points (their index in P)
+  const add = (name, p) => { if (name) W[name] = P.length; P.push(p); };
+  const g = (k, u, y, w, v, h = 0) => [...gcrP(k, u, y, w), v, h];
+  const d = (k, u, y, w, v, h = 0) => [...gdP(k, u, y, w), v, h];
+  const ring = (deg, r, v, h = 0) => { const a = (deg * Math.PI) / 180; return [Math.cos(a) * r, top + e, Math.sin(a) * r, v, h]; };
+  // the common room: in at the portrait hole, down its three steps, round the chairs to the fire
+  add('start', g(5, 0, 0.57 + e, -0.9, 0, 0.8));
+  add(null, g(5, 0, 0.57 + e, -0.15, 0.8));
+  add('steps', g(5, 0.05, e + 0.03, 1.15, 1.0));
+  add(null, [-3.0, e, 1.85, 1.15]);
+  add(null, [-2.45, e, 0.6, 1.15]);
+  add(null, [-1.6, e, -0.65, 0.9]);
+  add('fire', [-0.05, e, -1.2, 0.12, 2.0]);
+  add(null, [1.25, e, -0.45, 1.05]);
+  add('chess', [2.6, e, -0.2, 0.15, 0.5]);
+  add('south', [2.75, e, 1.35, 0.12, 2.2]);
+  add(null, g(3, -0.1, e, 1.0, 0.95));
+  add('door', g(3, 0, e, 0.0, 0.95));
+  add('turret', g(3, 0, e, -GCR.T, 1.0));
+  // the stair: four times round the newel, a little outside the middle of the treads
+  const a0 = ent0 + 0.35, a1 = ent0 + 0.45 + 55.5 * da;
+  add('climb', S(a0, 1.05, 1.2));
+  for (let a = a0 + 0.35; a < a1 - 0.2; a += 0.35) P.push(S(a, 0.95, 1.55));
+  add('landed', S(a1, 0.95, 1.0));
+  const aL = a1 + 0.42; P.push([c[0] + Math.cos(aL) * 0.95, top + e, c[2] + Math.sin(aL) * 0.95, 0.7]);
+  add(null, [c[0] + Math.cos(ent0 - 0.18) * 1.15, top + e, c[2] + Math.sin(ent0 - 0.18) * 1.15, 0.7]);
+  // the passage and the dormitory
+  add('passage', g(3, 0, top + e, -GCR.T, 0.75));
+  add(null, g(3, 0, top + e, GCR.A - GDM.R - GDM.T, 0.75));
+  add('in', d(0, 0.05, e, 0.35, 0.7));
+  add('look', d(0, 0.1, e, 2.15, 0, 2.6));
+  add(null, ring(52, 1.12, 0.55));
+  add(null, ring(70, 1.08, 0.55));
+  add('harry', ring(88, 1.08, 0, 2.6));
+  add(null, ring(115, 1.08, 0.55));
+  add('ron', ring(140, 1.08, 0, 1.2));
+  add('end', ring(160, 1.08, 0, 4.8));
+  return { R: gwRoute(P), W, c, ent0, top, rpa: rise / da };   // rpa: the stair's rise per radian
+}
+function gryffWalkShots() {
+  ensureInterior('gryff');
+  const { R, W, top, c, rpa } = gwPaths(), Ta = (n) => R.Ta[W[n]], Td = (n) => R.Td[W[n]];
+  const fire = [0.85, 1.05, -4.9], chess = [3.85, 0.62, -1.0], paint = gcrP(4, 0.45, 3.3, 0.16), dress = gcrP(3, 1.6, 2.35, 0.3);
+  const keys = [
+    { t: 0, look: [0.85, 2.3, -5.0] }, { t: Ta('steps'), look: [0.6, 1.9, -5.0] }, { t: Ta('fire') - 2.2, look: fire },
+    { t: Td('fire') - 0.2, look: [0.6, 1.5, -4.9] },
+    { t: Ta('chess') - 1.4, look: [3.9, 1.8, -2.6] }, { t: Ta('chess') + 0.2, look: chess },
+    { t: Ta('south') + 0.4, look: paint }, { t: Ta('south') + 1.8, look: paint }, { t: Td('south') - 0.4, look: dress },
+    { t: Ta('door') - 0.3, look: gcrP(3, 0.2, 2.0, -2.6) }, { t: Ta('turret'), ahead: 0.18 },
+  ];
+  // up the stair the view goes ahead round the newel to the treads rising there, a little lower than the eye
+  for (let t = Ta('climb') + 0.5; t < Ta('landed') - 0.3; t += 0.6) {
+    const p = R.at(t), a = Math.atan2(p[2] - c[2], p[0] - c[0]) + 1.15;   // 1.15 rad further round, as high as the eye there less 0.42 m
+    keys.push({ t, look: [c[0] + Math.cos(a) * 0.7, p[1] + 1.15 * rpa - 0.42, c[2] + Math.sin(a) * 0.7] });
+  }
+  keys.push({ t: Ta('landed') + 0.3, ahead: 0.08 }, { t: Ta('passage') - 0.4, look: [0, top + 1.4, 0] }, { t: Ta('in'), look: [0, top + 1.1, 0] },
+    { t: Ta('look') + 0.5, look: gdP(10, 0, 1.3, 1.6) }, { t: Ta('look') + 1.5, look: gdP(10, 0, 1.3, 1.6) }, { t: Td('look') - 0.2, look: gdP(2, 0, 1.3, 1.7) },
+    { t: Td('look') + 1.2, look: gdP(2, 0.2, 1.0, 1.4) }, { t: Ta('harry') + 0.2, look: gdP(2, 0, 0.75, 2.4) }, { t: Td('harry') - 0.3, look: gdP(2, 0, 0.95, 1.6) },
+    { t: Ta('ron') - 0.3, look: gdP(4, 0, 0.95, 1.7) }, { t: Td('ron'), look: gdP(4, 0, 1.1, 1.4) },
+    { t: Ta('end') + 0.6, look: gdP(6, 0, 1.6, 0.9) }, { t: Ta('end') + 3.4, look: [0.3, top + 4.4, 0.1] }, { t: R.T1, look: [0.3, top + 4.6, 0.1] });
+  const look = gwLook(R, keys);
+  const END = R.T1 + 0.4;
+  const shot = { name: 'gryffwalk', t0: 0, dur: END, scene: 'gryff', night: true, fleet: false, bloom: 0.08, fadeIn: 1.4, fadeOut: 2.2,
+    title: [END - 4.6, END + 1], titleCard: { en: 'Gryffindor Tower', zh: '格兰芬多塔', by: '出品人　@dasungta_zhang', src: '参考：利维斯登片场照片（维基共享资源，CC BY）·《哈利·波特与混血王子》' },
+    keys: [K(0, [0, 0, 0], [0, 0, -1], GW.fov)],
+    rig: (lt) => { const p = R.at(lt), q = look(lt); return { p, q: vadd(p, q), f: GW.fov }; },
+    enter: () => { camera.near = 0.05; camera.far = 400; camera.updateProjectionMatrix(); },
+    update: () => { INTSKY.uCeil.value = -1; },
+  };
+  TOUR.dur = END;
+  return [shot];
+}
+function gryffWalkStop() { camera.near = 0.5; camera.far = 90000; camera.updateProjectionMatrix(); }
+
 // ================================================================== 90-main.js
 // ------------------------------------------------------------------ light, environment, shots
 const sunLight = new THREE.DirectionalLight(new THREE.Color(1.0, 0.86, 0.68), num('sun', 4.2));
@@ -12637,9 +12768,9 @@ async function main() {
     console.log('[tris]', Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([k, v]) => k + ' ' + (v / 1e6).toFixed(2) + 'M').join(', '));
   }
   if (HEADLESS && Q.has('film')) {
-    await Promise.all(['九月一日夜霍格莫德车站坐船过黑湖门厅与大楼梯大礼堂开学晚宴第二天清晨霍格沃茨城堡与场地之后出品人@dasungta_zhang参考：拍摄模型照片（维基共享资源，Karen Roe 等摄，CC BY）· Harry Potter Wiki · 乐高 76419'].map((s) => document.fonts.load('500 40px "Noto Serif SC"', s).catch(() => {})));
+    await Promise.all(['九月一日夜霍格莫德车站坐船过黑湖门厅与大楼梯大礼堂开学晚宴第二天清晨霍格沃茨城堡与场地之后出品人@dasungta_zhang参考：拍摄模型照片（维基共享资源，Karen Roe 等摄，CC BY）· Harry Potter Wiki · 乐高 76419', '格兰芬多塔参考：利维斯登片场照片（维基共享资源，CC BY）·《哈利·波特与混血王子》'].map((s) => document.fonts.load('500 40px "Noto Serif SC"', s).catch(() => {})));
     await document.fonts.load('700 40px "Noto Serif SC"', SN_LABEL_TEXT).catch(() => {});   // the snitch film's place names
-    await document.fonts.load('60px "IM Fell English SC"', "Hogwarts TheBoathouseViaductTrainingGroundsAstronomyTowerSuspensionBridgeGrandStaircaseMovingGreatHallClockCourtyardWoodenOwleryStoneCircleWhompingWillowHagrid'sHutQuidditchPitch").catch(() => {});
+    await document.fonts.load('60px "IM Fell English SC"', "Hogwarts TheBoathouseViaductTrainingGroundsAstronomyTowerSuspensionBridgeGrandStaircaseMovingGreatHallClockCourtyardWoodenOwleryStoneCircleWhompingWillowHagrid'sHutQuidditchPitch GryffindorTower").catch(() => {});
     tourInit();
     window.__tourFrame = tourFrame;
     window.__ev = (src) => eval(src);   // tools/probe.mjs: run a snippet inside the module (to try camera keys)
@@ -12712,11 +12843,12 @@ async function main() {
   let tn = 0, lastQ = null;
   const startTour = async () => {
     const ld = $('loading'), lt = $('load-msg'), prev = lt.textContent;
-    if (!INT.hall || !INT.stair || !TOUR.shots) {
-      ld.hidden = false; lt.textContent = '正在准备运镜（搭建门厅和大礼堂）……';
+    const rooms = TOUR.cut === 'gryff' ? ['gryff'] : ['stair', 'hall'];   // the sets the cut plays in
+    if (rooms.some((k) => !INT[k]) || !TOUR.shots) {
+      ld.hidden = false; lt.textContent = TOUR.cut === 'gryff' ? '正在准备运镜（搭建格兰芬多塔）……' : '正在准备运镜（搭建门厅和大礼堂）……';
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       tourInit();
-      for (const k of ['stair', 'hall']) if (renderer.compileAsync) await renderer.compileAsync(INT[k].scene, camera).catch(() => {});
+      for (const k of rooms) if (renderer.compileAsync && INT[k]) await renderer.compileAsync(INT[k].scene, camera).catch(() => {});
       ld.hidden = true; lt.textContent = prev;
     }
     $('tourpos').max = TOUR.dur.toFixed(1);

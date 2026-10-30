@@ -50,8 +50,9 @@
 - **三处室内**：大礼堂（石兽火盆、金色猫头鹰讲台、院旗、漂浮的蜡烛、施了魔法的天花板）；门厅和会转动的大楼梯（金框肖像、盔甲骑士）；
   格兰芬多塔：公共休息室（红底千花挂毯、刻着院徽的大石壁炉、红丝绒扶手椅、波斯地毯、黄铜吊灯、一盘巫师棋），顺螺旋石梯上去是男生宿舍
   （挂红帐子的四柱床、刻着缩写的箱子、铁丝罩里的铸铁炉）
-- **四段可以在页面里播放的影片**：默认是镜头巡游；网址加 `?cut=snitch`（跟着金色飞贼的穿越机视角）、`?cut=dusk`（黄昏）
-  或 `?cut=magic`（魔法光）再点"播放运镜"。分镜在 [docs/](docs/)。
+- **五段可以在页面里播放的影片**：默认是镜头巡游；网址加 `?cut=snitch`（跟着金色飞贼的穿越机视角）、`?cut=dusk`（黄昏）、
+  `?cut=magic`（魔法光）或 `?cut=gryff`（夜里第一人称一镜到底走一遍格兰芬多塔：休息室转一圈，顺螺旋石梯上去进宿舍）再点"播放运镜"。
+  分镜在 [docs/](docs/)。
 
 ## 怎么做的
 
@@ -124,7 +125,7 @@ node tools/film.mjs --spp 8 --w 1920 --h 1080 --out out/snitch --name hogwarts-s
 Chrome 不在默认位置时，用环境变量 `CHROME` 指定路径。影片出来是没有声音的，配乐请用你自己有权使用的音乐。
 
 网址参数在线版和本地都能用，比如 <https://dasungta.github.io/hogwarts-replica/?shot=front&night=1>：`shot=` 机位（`front`、`hall`、`stair`、`quidditch` 等，和"镜头"菜单一致）、`night=1` 夜晚、`map=1` 打开地图、
-`cut=snitch|dusk|magic` 换要播放的影片、`grade=natural` 关掉电影调色。
+`cut=snitch|dusk|magic|gryff` 换要播放的影片、`grade=natural` 关掉电影调色。
 
 参考照片可以重新下载：`python -I tools/commons_fetch.py ref/model --restore`（`ref/` 下其他文件夹同理）。
 

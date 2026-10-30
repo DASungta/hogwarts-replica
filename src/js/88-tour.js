@@ -4,7 +4,7 @@
 // boats, Hagrid's lantern, the turning stair, the enchanted ceiling). The page plays it in real time as a preview;
 // tools/film.mjs renders it frame by frame (several samples per frame spread over the shutter, so it has motion blur).
 const TOUR_FPS = 24;
-const TOUR = { shots: null, dur: 0, playing: false, t: 0, cur: -1, cut: Q.get('cut') || 'tour' };   // cut: the tour, 'magic' (89-short.js) or 'dusk' (89b-dusk.js)
+const TOUR = { shots: null, dur: 0, playing: false, t: 0, cur: -1, cut: Q.get('cut') || 'tour' };   // cut: the tour, 'magic' (89-short.js), 'dusk' (89b-dusk.js), 'snitch' (89c), 'gryff' (89d-gryffwalk.js)
 const TOURX = { fleet: null, fleetBody: null, fleetLamps: null, lantern: null, lampPos: [], boat: null };
 
 // ---- interpolation: keys [{ t, p, q, f }] → camera at time t; zero tangents at the ends ease the move in and out
@@ -272,8 +272,8 @@ function drawCaption(g, w, h, c) { // the same caption drawn into a video frame 
 }
 function tourInit() {
   buildTourProps();
-  ensureInterior('stair'); ensureInterior('hall');
-  if (!TOUR.shots) TOUR.shots = TOUR.cut === 'magic' ? shortShots() : TOUR.cut === 'dusk' ? duskShots() : TOUR.cut === 'snitch' ? snitchShots() : tourShots();
+  if (TOUR.cut !== 'gryff') { ensureInterior('stair'); ensureInterior('hall'); }
+  if (!TOUR.shots) TOUR.shots = TOUR.cut === 'magic' ? shortShots() : TOUR.cut === 'dusk' ? duskShots() : TOUR.cut === 'snitch' ? snitchShots() : TOUR.cut === 'gryff' ? gryffWalkShots() : tourShots();
 }
 function tourStop() {
   TOUR.playing = false; TOUR.cur = -1;
@@ -287,6 +287,7 @@ function tourStop() {
   if (TOUR.cut === 'magic') shortStop();
   if (TOUR.cut === 'dusk') duskStop();
   if (TOUR.cut === 'snitch') snitchStop();
+  if (TOUR.cut === 'gryff') gryffWalkStop();
   pipeline.lutBlend = 1;
 }
 // one frame of a named shot at its own time lt, levels measured afresh (tools/probe.mjs)

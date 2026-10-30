@@ -121,11 +121,12 @@ M.globe = procMat({ name: 'globe', rgb: [0.5, 0.45, 0.38], rough: 0.3, frag: /* 
   float h = 0.6 + 0.4 * cgVn(P * 30.0);
   cgEmit = vec3(1.0, 0.66, 0.32) * (0.22 + 2.4 * uLamp) * h;
 ` });
-// a fine iron mesh (the fire screen): wires 2 mm, 12 mm apart (uv in metres)
-M.ironMesh = procMat({ name: 'ironMesh', rgb: [0.03, 0.028, 0.025], rough: 0.5, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
+// a fine iron mesh (the fire screen, the stove's guard): wires 2 mm, 12 mm apart (uv in metres), see-through by its
+// coverage where the wires are finer than a pixel (stochastic discard sparkled in the film, moving)
+M.ironMesh = procMat({ name: 'ironMesh', rgb: [0.03, 0.028, 0.025], rough: 0.5, uv: true, side: THREE.DoubleSide, std: { transparent: true, depthWrite: false }, frag: /* glsl */ `
   vec2 g = abs(fract(UV / 0.012) - 0.5); float px = length(fwidth(UV / 0.012));
-  if (px < 0.3) { if (max(g.x, g.y) < 0.36 - px) discard; }
-  else if (cgH21(gl_FragCoord.xy + fract(P.xy * 37.0) * 91.0) > 0.48) discard;
+  float wire = smoothstep(0.36 - px - 0.02, 0.36 + px, max(g.x, g.y));
+  diffuseColor.a = mix(wire, 0.48, smoothstep(0.15, 0.45, px));
 ` });
 // pierced brass (the chandelier's band): a row of quatrefoils (uv in metres)
 M.pierced = procMat({ name: 'pierced', rgb: [0.72, 0.5, 0.2], metal: 1, rough: 0.32, uv: true, side: THREE.DoubleSide, frag: /* glsl */ `
@@ -835,7 +836,7 @@ function buildGryffindorCommon(sc) {
       const pan = (u0, u1, w0, w1) => {
         const dx = u1 - u0, dz = w1 - w0, Lp = Math.hypot(dx, dz), ry = Math.atan2(-dz, dx), y0 = 0.1, y1 = 0.92;
         const g = new THREE.PlaneGeometry(Lp, y1 - y0), uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * Lp, uv.getY(i) * (y1 - y0));
-        gcrPut(k, 'ironMesh', g.rotateY(ry).translate((u0 + u1) / 2, (y0 + y1) / 2, (w0 + w1) / 2));
+        addMesh(g.rotateY(ry).translate((u0 + u1) / 2, (y0 + y1) / 2, (w0 + w1) / 2).applyMatrix4(gcrM(k)), M.ironMesh, { cast: false, recv: false });   // no shadow: it would hide the fire
         for (const y of [y0, y1]) gcrPut(k, 'brass', new THREE.CylinderGeometry(0.012, 0.012, Lp, 8).rotateZ(Math.PI / 2).rotateY(ry).translate((u0 + u1) / 2, y, (w0 + w1) / 2));
         for (const [u, w] of [[u0, w0], [u1, w1]]) { gcrPut(k, 'brass', new THREE.CylinderGeometry(0.014, 0.014, 0.9, 8).translate(u, 0.51, w)); gcrPut(k, 'brass', new THREE.SphereGeometry(0.026, 8, 6).translate(u, 0.97, w)); }
       };
@@ -878,13 +879,13 @@ function buildGryffindorCommon(sc) {
       put('stairstone', Wt.stone.clone().applyMatrix4(m)); put('gglass', Wt.glass.clone().translate(0, 0, 0.06).applyMatrix4(m));
     }
     const sl = [], sb = [], v = new THREE.Vector3();
-    for (const [a, y0] of [[ent0 + 1.6, 1.0], [ent0 - 1.4, 4.0], [ent0 + 2.2, 6.8], [ent0 - 1.9, 9.0]]) {
+    for (const [a, y0] of [[ent0 + 1.6, 1.0], [ent0 + 3.0, 2.4], [ent0 - 1.4, 4.0], [ent0 + 0.9, 5.4], [ent0 + 2.2, 6.8], [ent0 - 2.6, 8.0], [ent0 - 1.9, 9.0]]) {
       const y = treadAt(a, y0 + 2.8) + 1.95, m = xf([c[0] + Math.cos(a) * (rr - 0.03), y, c[2] + Math.sin(a) * (rr - 0.03)], Math.atan2(-Math.cos(a), -Math.sin(a)));
       sb.push(m); sl.push(m.clone().multiply(xf([0, -0.02, 0.24], 0, 0.75)));
     }
     addInst(merge([new THREE.BoxGeometry(0.08, 0.13, 0.025), new THREE.CylinderGeometry(0.01, 0.01, 0.24, 8).rotateX(Math.PI / 2).translate(0, -0.03, 0.12)]), M.brass, sb);
     addInst(GCR_LAMP.brass, M.brass, sl); addInst(GCR_LAMP.globe, M.globe, sl, null, { cast: false });
-    for (const m of sl) { v.set(0, GCR_LAMP.top, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.6, 0.28].map((q) => q * 2.2), r: 3.6, halo: 0.16, hk: 0.45, see: 25 }); }
+    for (const m of sl) { v.set(0, GCR_LAMP.top, 0).applyMatrix4(m); LAMPS.push({ room: GCR_ROOM, p: [v.x, v.y, v.z], c: [1.0, 0.6, 0.28].map((q) => q * 2.8), r: 4.0, halo: 0.16, hk: 0.45, see: 25 }); }
     // the passage from the landing through the dormitory's wall to its door (the dormitory's facet 0 faces this way)
     lbox(k, -0.78, 0.78, top - 0.35, top, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'stairstone', 0.0);
     for (const s of [-1, 1]) lbox(k, s < 0 ? -1.1 : 0.72, s < 0 ? -0.72 : 1.1, top, top + 2.85, -T - 0.2, -GDM.T + (GCR.A - GDM.R) + 0.02, 'gstone', 0.0);

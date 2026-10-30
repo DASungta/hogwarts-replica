@@ -60,9 +60,10 @@ keeps accumulating samples and gets cleaner the longer you wait. The interface i
   and Gryffindor Tower: the common room (red millefleur tapestries, the great hooded fireplace with the house crest, velvet
   armchairs, Persian rugs, the brass chandelier, a game of wizard chess) and, up the spiral stair, the boys' dormitory
   (four-poster beds with red curtains, trunks with initials, the iron stove in its wire guard)
-- **Four films that play in the page**: the camera tour by default; add `?cut=snitch` (an FPV flight following the Golden
-  Snitch), `?cut=dusk` (dusk) or `?cut=magic` (a spell of light) to the address and press the tour button. Storyboards
-  (in Chinese) are in [docs/](docs/).
+- **Five films that play in the page**: the camera tour by default; add `?cut=snitch` (an FPV flight following the Golden
+  Snitch), `?cut=dusk` (dusk), `?cut=magic` (a spell of light) or `?cut=gryff` (a first-person walk through Gryffindor
+  Tower at night in one unbroken shot: round the common room, up the spiral stair and into the dormitory) to the address
+  and press the tour button. Storyboards (in Chinese) are in [docs/](docs/).
 
 ## How it was made
 
@@ -153,7 +154,7 @@ If Chrome is not in its usual place, set the `CHROME` environment variable to it
 them with music you have the right to use.
 
 Address parameters work online and locally, for example <https://dasungta.github.io/hogwarts-replica/?shot=front&night=1>: `shot=` a viewpoint (`front`, `hall`, `stair`, `quidditch` and the rest of the shot menu),
-`night=1` night, `map=1` open the map, `cut=snitch|dusk|magic` choose the film, `grade=natural` turn off the film grade.
+`night=1` night, `map=1` open the map, `cut=snitch|dusk|magic|gryff` choose the film, `grade=natural` turn off the film grade.
 
 The reference photos can be downloaded again: `python -I tools/commons_fetch.py ref/model --restore` (likewise for the
 other folders in `ref/`).

@@ -76,7 +76,7 @@ M.wool = procMat({ name: 'wool', rgb: [0.15, 0.022, 0.02], rough: 0.95, bump: 1,
 // a knitted patchwork blanket (Ron's, c13): squares of coloured wool (uv in metres)
 M.patch = procMat({ name: 'patch', rgb: [1, 1, 1], rough: 0.95, uv: true, bump: 1, frag: /* glsl */ `
   vec2 c = floor(UV / 0.14); float h = cgH21(c), h2 = cgH21(c + 5.3);
-  vec3 col = 0.5 + 0.5 * cos(6.2831 * (h + vec3(0.0, 0.33, 0.67))); col = mix(col, vec3(0.85, 0.8, 0.7), step(0.8, h2)) * 0.42;
+  vec3 col = 0.5 + 0.5 * cos(6.2831 * (h + vec3(0.0, 0.33, 0.67))); col = mix(mix(col, vec3(0.55, 0.45, 0.35), 0.45), vec3(0.75, 0.7, 0.6), step(0.8, h2)) * 0.32;   // faded knitted wool
   vec2 f = fract(UV / 0.14); float seam = smoothstep(0.0, 0.06, min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y)));
   float k = cgVn(vec3(UV * vec2(180.0, 90.0), h * 9.0));
   diffuseColor.rgb = col * (0.75 + 0.3 * k) * mix(0.6, 1.0, seam); cgH = k * 0.0008 + seam * 0.002;
@@ -203,7 +203,7 @@ function buildGryffDorm(sc, points) {
     put('grille', col.translate(c[0], Y + 0.85, c[2]));
     put('stoveGlow', new THREE.CylinderGeometry(0.32, 0.32, 0.21, 24).translate(c[0], Y + 0.85, c[2]));
     const gd = new THREE.CylinderGeometry(0.64, 0.64, 1.0, 56, 1, true), gu = gd.attributes.uv; for (let i = 0; i < gu.count; i++) gu.setXY(i, gu.getX(i) * Math.PI * 2 * 0.64, gu.getY(i) * 1.0);
-    put('ironMesh', gd.translate(c[0], Y + 0.07 + 0.5, c[2]));
+    addMesh(gd.translate(c[0], Y + 0.07 + 0.5, c[2]), M.ironMesh, { cast: false, recv: false });
     for (const y of [0.09, 1.07]) put('castIron', new THREE.TorusGeometry(0.64, y > 1 ? 0.022 : 0.014, 8, 56).rotateX(Math.PI / 2).translate(c[0], Y + y, c[2]));
     for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; put('castIron', new THREE.CylinderGeometry(0.01, 0.01, 1.0, 6).translate(c[0] + Math.cos(a) * 0.64, Y + 0.57, c[2] + Math.sin(a) * 0.64)); }
     const pipe = [[-0.22, 0.93, -0.22], [-0.36, 0.97, -0.36], [-0.44, 1.12, -0.44], [-0.44, 1.55, -0.44], [-0.44, GDM.apex - 0.4, -0.44]].map(([x, y, z]) => new THREE.Vector3(c[0] + x, Y + y, c[2] + z));
